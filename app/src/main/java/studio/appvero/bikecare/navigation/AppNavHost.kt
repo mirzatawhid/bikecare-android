@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import studio.appvero.bikecare.features.auth.ui.screen.SplashRoute
 
 @Composable
 fun AppNavHost(
@@ -16,7 +17,30 @@ fun AppNavHost(
 
         composable<SplashRoute> {
 
+            SplashRoute(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo<SplashRoute> {
+                            inclusive = true
+                        }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo<SplashRoute> {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
 
+        composable<LoginRoute> {
+            // LoginRoute(...)
+        }
+
+        composable<HomeRoute> {
+            // HomeRoute(...)
+        }
     }
 }
