@@ -1,230 +1,134 @@
 package studio.appvero.bikecare.ui.theme
 
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 
-/*
- * ============================================================
- * BRAND PRIMITIVES
- * ============================================================
- *
- * These are the only places where the brand's raw colors live.
- *
- * Do not use these directly from screens.
- * Screens should consume MaterialTheme.colorScheme or
- * AppTheme.colors.
- */
-
-object BikeTrackerBrand {
-
-    // Primary brand identity
-    val DeepForestGreen = Color(0xFF0B1F17)
-    val RichMotorcycleGreen = Color(0xFF123D2A)
-
-    // Accent
-    val ElectricLime = Color(0xFFB7F34A)
-
-    // Light foundation
-    val WarmOffWhite = Color(0xFFF5F7F3)
-
-    // Neutral
-    val NearBlack = Color(0xFF101412)
-    val MutedGreenGray = Color(0xFF66716B)
-
-    // Semantic colors
-    val Success = Color(0xFF3FA66B)
-    val Warning = Color(0xFFF2B84B)
-    val Error = Color(0xFFD94A4A)
-    val Info = Color(0xFF4C8DFF)
-
-    // Dark-mode secondary text requested by the design spec.
-    //
-    // This is deliberately kept as a theme-level token rather
-    // than being scattered through UI code.
-    val DarkSecondaryText = Color(0xFFA8B2AC)
-
-    // Surface used by the dark theme.
-    val DarkBackground = Color(0xFF08120E)
+object BikeCareBrand {
+    val Canvas = Color(0xFFF4F3EF)
+    val Surface = Color(0xFFFFFFFF)
+    val Ink = Color(0xFF232622)
+    val Muted = Color(0xFF6D716A)
+    val Accent = Color(0xFFED6338)
+    val AccentText = Color(0xFFB63B17)
+    val Success = Color(0xFF26714D)
+    val Warning = Color(0xFF8A5B0D)
 }
 
-
-/*
- * ============================================================
- * LIGHT MATERIAL 3 COLOR SCHEME
- * ============================================================
- */
-
-val BikeTrackerLightColorScheme: ColorScheme = lightColorScheme(
-
-    primary = BikeTrackerBrand.DeepForestGreen,
-    onPrimary = BikeTrackerBrand.WarmOffWhite,
-
-    primaryContainer = BikeTrackerBrand.RichMotorcycleGreen,
-    onPrimaryContainer = BikeTrackerBrand.ElectricLime,
-
-    secondary = BikeTrackerBrand.RichMotorcycleGreen,
-    onSecondary = BikeTrackerBrand.WarmOffWhite,
-
-    secondaryContainer = BikeTrackerBrand.MutedGreenGray,
-    onSecondaryContainer = BikeTrackerBrand.WarmOffWhite,
-
-    tertiary = BikeTrackerBrand.ElectricLime,
-    onTertiary = BikeTrackerBrand.NearBlack,
-
-    tertiaryContainer = BikeTrackerBrand.ElectricLime,
-    onTertiaryContainer = BikeTrackerBrand.NearBlack,
-
-    background = BikeTrackerBrand.WarmOffWhite,
-    onBackground = BikeTrackerBrand.NearBlack,
-
-    surface = Color.White,
-    onSurface = BikeTrackerBrand.NearBlack,
-
-    surfaceVariant = BikeTrackerBrand.MutedGreenGray,
-    onSurfaceVariant = BikeTrackerBrand.WarmOffWhite,
-
-    outline = BikeTrackerBrand.MutedGreenGray,
-    outlineVariant = BikeTrackerBrand.MutedGreenGray.copy(alpha = 0.55f),
-
-    error = BikeTrackerBrand.Error,
+// Primary is the readable text/outlined-control orange. Filled actions use
+// AppTheme.colors.action / onAction so their labels remain readable.
+val BikeCareLightColorScheme = lightColorScheme(
+    primary = BikeCareBrand.AccentText,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFFFDBCE),
+    onPrimaryContainer = Color(0xFF561B08),
+    secondary = BikeCareBrand.Muted,
+    onSecondary = Color.White,
+    secondaryContainer = Color(0xFFE5E6DF),
+    onSecondaryContainer = BikeCareBrand.Ink,
+    tertiary = BikeCareBrand.Muted,
+    onTertiary = Color.White,
+    tertiaryContainer = Color(0xFFE5E6DF),
+    onTertiaryContainer = BikeCareBrand.Ink,
+    background = BikeCareBrand.Canvas,
+    onBackground = BikeCareBrand.Ink,
+    surface = BikeCareBrand.Surface,
+    onSurface = BikeCareBrand.Ink,
+    surfaceVariant = Color(0xFFE9E8E2),
+    // Slightly darker than the foundation muted token for 4.5:1 on canvas.
+    onSurfaceVariant = Color(0xFF6C7069),
+    surfaceTint = BikeCareBrand.AccentText,
+    surfaceBright = Color.White,
+    surfaceDim = Color(0xFFDDDDD6),
+    surfaceContainerLowest = Color.White,
+    surfaceContainerLow = Color(0xFFF9F8F5),
+    surfaceContainer = BikeCareBrand.Canvas,
+    surfaceContainerHigh = Color(0xFFEEEDE7),
+    surfaceContainerHighest = Color(0xFFE9E8E2),
+    outline = Color(0xFF7A7E76),
+    outlineVariant = Color(0xFFCCCFC5),
+    error = Color(0xFFB3261E),
     onError = Color.White,
-
-    errorContainer = BikeTrackerBrand.Error.copy(alpha = 0.14f),
-    onErrorContainer = BikeTrackerBrand.Error,
-
-    inverseSurface = BikeTrackerBrand.NearBlack,
-    inverseOnSurface = BikeTrackerBrand.WarmOffWhite,
-    inversePrimary = BikeTrackerBrand.ElectricLime,
-
-    scrim = Color.Black
+    errorContainer = Color(0xFFF9DEDC),
+    onErrorContainer = Color(0xFF410E0B),
+    inverseSurface = BikeCareBrand.Ink,
+    inverseOnSurface = BikeCareBrand.Canvas,
+    inversePrimary = Color(0xFFFFAD91),
+    scrim = Color.Black,
 )
 
-
-/*
- * ============================================================
- * DARK MATERIAL 3 COLOR SCHEME
- * ============================================================
- *
- * This is intentionally NOT a simple inversion of light mode.
- *
- * Visual direction:
- *
- * Carbon
- * + Motorcycle Green
- * + Electric Lime
- */
-
-val BikeTrackerDarkColorScheme: ColorScheme = darkColorScheme(
-
-    primary = BikeTrackerBrand.ElectricLime,
-    onPrimary = BikeTrackerBrand.NearBlack,
-
-    primaryContainer = BikeTrackerBrand.RichMotorcycleGreen,
-    onPrimaryContainer = BikeTrackerBrand.ElectricLime,
-
-    secondary = BikeTrackerBrand.RichMotorcycleGreen,
-    onSecondary = BikeTrackerBrand.WarmOffWhite,
-
-    secondaryContainer = BikeTrackerBrand.DeepForestGreen,
-    onSecondaryContainer = BikeTrackerBrand.WarmOffWhite,
-
-    tertiary = BikeTrackerBrand.ElectricLime,
-    onTertiary = BikeTrackerBrand.NearBlack,
-
-    tertiaryContainer = BikeTrackerBrand.RichMotorcycleGreen,
-    onTertiaryContainer = BikeTrackerBrand.ElectricLime,
-
-    background = BikeTrackerBrand.DarkBackground,
-    onBackground = BikeTrackerBrand.WarmOffWhite,
-
-    surface = BikeTrackerBrand.DeepForestGreen,
-    onSurface = BikeTrackerBrand.WarmOffWhite,
-
-    surfaceVariant = BikeTrackerBrand.RichMotorcycleGreen,
-    onSurfaceVariant = BikeTrackerBrand.DarkSecondaryText,
-
-    outline = BikeTrackerBrand.MutedGreenGray,
-    outlineVariant = BikeTrackerBrand.MutedGreenGray.copy(alpha = 0.60f),
-
-    error = BikeTrackerBrand.Error,
-    onError = Color.White,
-
-    errorContainer = BikeTrackerBrand.Error.copy(alpha = 0.18f),
-    onErrorContainer = Color.White,
-
-    inverseSurface = BikeTrackerBrand.WarmOffWhite,
-    inverseOnSurface = BikeTrackerBrand.NearBlack,
-    inversePrimary = BikeTrackerBrand.DeepForestGreen,
-
-    scrim = Color.Black
+val BikeCareDarkColorScheme = darkColorScheme(
+    primary = Color(0xFFFFAD91),
+    onPrimary = Color(0xFF561B08),
+    primaryContainer = Color(0xFF713018),
+    onPrimaryContainer = Color(0xFFFFDBCE),
+    secondary = Color(0xFFC2C6BA),
+    onSecondary = BikeCareBrand.Ink,
+    secondaryContainer = Color(0xFF3D4139),
+    onSecondaryContainer = Color(0xFFE5E6DF),
+    tertiary = Color(0xFFC2C6BA),
+    onTertiary = BikeCareBrand.Ink,
+    tertiaryContainer = Color(0xFF3D4139),
+    onTertiaryContainer = Color(0xFFE5E6DF),
+    background = Color(0xFF171916),
+    onBackground = BikeCareBrand.Canvas,
+    surface = BikeCareBrand.Ink,
+    onSurface = BikeCareBrand.Canvas,
+    surfaceVariant = Color(0xFF353831),
+    onSurfaceVariant = Color(0xFFB6BAB0),
+    surfaceTint = Color(0xFFFFAD91),
+    surfaceBright = Color(0xFF3C3F38),
+    surfaceDim = Color(0xFF171916),
+    surfaceContainerLowest = Color(0xFF11130F),
+    surfaceContainerLow = Color(0xFF1D201B),
+    surfaceContainer = BikeCareBrand.Ink,
+    surfaceContainerHigh = Color(0xFF2C2F28),
+    surfaceContainerHighest = Color(0xFF353831),
+    outline = Color(0xFF90958A),
+    outlineVariant = Color(0xFF484C43),
+    error = Color(0xFFFFB4AB),
+    onError = Color(0xFF690005),
+    errorContainer = Color(0xFF93000A),
+    onErrorContainer = Color(0xFFFFDAD6),
+    inverseSurface = BikeCareBrand.Canvas,
+    inverseOnSurface = BikeCareBrand.Ink,
+    inversePrimary = BikeCareBrand.AccentText,
+    scrim = Color.Black,
 )
-
-
-/*
- * ============================================================
- * CUSTOM SEMANTIC COLORS
- * ============================================================
- *
- * Material 3 has error, but it does not have first-class
- * application semantics for success/warning/info.
- */
 
 @Immutable
 data class AppColors(
+    val action: Color,
+    val onAction: Color,
     val success: Color,
     val warning: Color,
     val error: Color,
-    val info: Color
+    val info: Color,
 )
 
-
-val BikeTrackerLightAppColors = AppColors(
-    success = BikeTrackerBrand.Success,
-    warning = BikeTrackerBrand.Warning,
-    error = BikeTrackerBrand.Error,
-    info = BikeTrackerBrand.Info
+val BikeCareLightAppColors = AppColors(
+    action = BikeCareBrand.Accent,
+    onAction = BikeCareBrand.Ink,
+    success = BikeCareBrand.Success,
+    warning = BikeCareBrand.Warning,
+    error = BikeCareLightColorScheme.error,
+    info = Color(0xFF345E80),
+)
+val BikeCareDarkAppColors = AppColors(
+    action = BikeCareBrand.Accent,
+    onAction = BikeCareBrand.Ink,
+    success = Color(0xFF88D5AA),
+    warning = Color(0xFFEFC477),
+    error = BikeCareDarkColorScheme.error,
+    info = Color(0xFFA2CBEA),
 )
 
-
-val BikeTrackerDarkAppColors = AppColors(
-    success = BikeTrackerBrand.Success,
-    warning = BikeTrackerBrand.Warning,
-    error = BikeTrackerBrand.Error,
-    info = BikeTrackerBrand.Info
-)
-
-
-/*
- * ============================================================
- * COMPOSITION LOCAL
- * ============================================================
- */
-
-val LocalAppColors = staticCompositionLocalOf<AppColors> {
-    BikeTrackerLightAppColors
-}
-
-
-/*
- * ============================================================
- * PUBLIC ACCESSOR
- * ============================================================
- *
- * Usage:
- *
- * AppTheme.colors.success
- * AppTheme.colors.warning
- * AppTheme.colors.error
- * AppTheme.colors.info
- */
+val LocalAppColors = staticCompositionLocalOf { BikeCareLightAppColors }
 
 object AppTheme {
-
     val colors: AppColors
-        @androidx.compose.runtime.Composable
-        get() = LocalAppColors.current
+        @Composable get() = LocalAppColors.current
 }

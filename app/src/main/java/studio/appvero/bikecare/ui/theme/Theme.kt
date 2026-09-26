@@ -26,15 +26,15 @@ fun BikeCareTheme(
             }
         }
 
-        darkTheme -> BikeTrackerDarkColorScheme
+        darkTheme -> BikeCareDarkColorScheme
 
-        else -> BikeTrackerLightColorScheme
+        else -> BikeCareLightColorScheme
     }
 
     val appColors = if (darkTheme) {
-        BikeTrackerDarkAppColors
+        BikeCareDarkAppColors
     } else {
-        BikeTrackerLightAppColors
+        BikeCareLightAppColors
     }
 
     CompositionLocalProvider(
@@ -42,8 +42,8 @@ fun BikeCareTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = BikeTrackerTypography,
-            shapes = BikeTrackerShapes,
+            typography = BikeCareTypography,
+            shapes = BikeCareShapes,
             content = content
         )
     }

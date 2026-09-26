@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "studio.appvero.bikecare"
-        minSdk = 26
+        minSdk = 27
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"

@@ -1,14 +1,18 @@
 package studio.appvero.bikecare.features.auth.ui.screen
 
+import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,8 +24,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import studio.appvero.bikecare.R
+import studio.appvero.bikecare.ui.theme.AppDimensions
 import studio.appvero.bikecare.ui.theme.AppSpacing
+import studio.appvero.bikecare.ui.theme.AppTheme
 import studio.appvero.bikecare.ui.theme.BikeCareTheme
+
 
 @Composable
 fun SplashScreen(
@@ -31,7 +38,8 @@ fun SplashScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = AppDimensions.screenHorizontalPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -45,7 +53,8 @@ fun SplashScreen(
 
         Text(
             text = "BikeCare",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(AppSpacing.sm))
@@ -53,7 +62,7 @@ fun SplashScreen(
         Text(
             text = "Your bike, cared for.",
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
@@ -62,7 +71,8 @@ fun SplashScreen(
         when (uiState) {
             SplashUiState.Loading -> {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(AppSpacing.xl)
+                    modifier = Modifier.size(AppSpacing.xl),
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -80,6 +90,11 @@ fun SplashScreen(
                     Spacer(modifier = Modifier.height(AppSpacing.md))
 
                     Button(
+                        modifier = Modifier.heightIn(min = AppDimensions.minimumTouchTarget),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.action,
+                            contentColor = AppTheme.colors.onAction,
+                        ),
                         onClick = {
                             onEvent(SplashEvent.Retry)
                         }
@@ -92,13 +107,15 @@ fun SplashScreen(
     }
 }
 
-@Preview(name = "Splash Loading", showBackground = true, showSystemUi = true)
+@Preview(name = "Splash Loading Light", widthDp = 412, showBackground = true)
+@Preview(name = "Splash Loading Dark", widthDp = 412, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SplashScreenLoadingPreview() {
     BikeCareTheme { SplashScreen(uiState = SplashUiState.Loading, onEvent = {}) }
 }
 
-@Preview(name = "Splash Error", showBackground = true, showSystemUi = true)
+@Preview(name = "Splash Error Light", widthDp = 412, showBackground = true)
+@Preview(name = "Splash Error Dark", widthDp = 412, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SplashScreenErrorPreview() {
     BikeCareTheme {

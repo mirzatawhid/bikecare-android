@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.BikeCare" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.BikeCare" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#F4F3EF</item>
+        <item name="android:colorAccent">#B63B17</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
 </resources>
