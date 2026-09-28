@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import studio.appvero.bikecare.R
+import studio.appvero.bikecare.features.auth.data.repository.RegistrationResult
 import studio.appvero.bikecare.features.auth.data.repository.AuthRepository
 import studio.appvero.bikecare.features.auth.ui.screen.*
 import javax.inject.Inject
@@ -30,17 +31,6 @@ class RegisterViewModel @Inject constructor(private val repository: AuthReposito
             _sideEffect.resetReplayCache()
             return
         }
-        when (event) {
-            is RegisterEvent.GoogleTokenReceived -> {
-                if (_uiState.value.form.isGoogleLoading) authenticate { repository.signInWithGoogle(event.token) }
-                return
-            }
-            is RegisterEvent.GoogleFailed -> {
-                update { it.copy(isGoogleLoading = false, error = event.message) }
-                return
-            }
-            else -> Unit
-        }
         if (_uiState.value.form.busy) return
         when (event) {
             is RegisterEvent.EmailChanged -> update { it.copy(email = event.value, emailError = null, error = null, message = null) }
@@ -55,27 +45,27 @@ class RegisterViewModel @Inject constructor(private val repository: AuthReposito
                     authenticate { repository.register(validated.email, validated.password) }
                 }
             }
-            RegisterEvent.GoogleSignIn -> {
-                update { it.copy(isGoogleLoading = true, error = null, message = null) }
-                _sideEffect.tryEmit(RegisterSideEffect.LaunchGoogleSignIn)
-            }
+
             RegisterEvent.Login -> _sideEffect.tryEmit(RegisterSideEffect.NavigateToLogin)
-            else -> Unit
         }
     }
 
-    private fun authenticate(operation: suspend () -> Unit) {
+    private fun authenticate(operation: suspend () -> RegistrationResult) {
         viewModelScope.launch {
             try {
-                operation()
+                val result = operation()
                 // Clear passwords after success; never persist them in saved state.
                 update { it.copy(password = "", confirmPassword = "") }
-                _sideEffect.emit(RegisterSideEffect.NavigateToHome)
+                if (result == RegistrationResult.SignedIn) {
+                    _sideEffect.emit(RegisterSideEffect.NavigateToHome)
+                } else {
+                    update { it.copy(isLoading = false, message = R.string.auth_confirmation_required) }
+                }
             } catch (cancelled: CancellationException) {
-                update { it.copy(isLoading = false, isGoogleLoading = false) }
+                update { it.copy(isLoading = false) }
                 throw cancelled
             } catch (error: Exception) {
-                update { it.copy(isLoading = false, isGoogleLoading = false, error = authError(error)) }
+                update { it.copy(isLoading = false, error = authError(error)) }
             }
         }
     }

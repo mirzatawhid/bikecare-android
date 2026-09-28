@@ -24,7 +24,6 @@ internal fun AuthLayout(
     state: AuthFormState,
     submitLabel: String,
     onSubmit: () -> Unit,
-    onGoogle: () -> Unit,
     footer: @Composable () -> Unit,
     fields: @Composable ColumnScope.() -> Unit,
 ) {
@@ -68,24 +67,7 @@ internal fun AuthLayout(
                             Text(localizedString(R.string.auth_please_wait))
                         } else Text(submitLabel)
                     }
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
-                        HorizontalDivider(Modifier.weight(1f))
-                        Text(localizedString(R.string.auth_or), style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        HorizontalDivider(Modifier.weight(1f))
-                    }
-                    OutlinedButton(
-                        onClick = onGoogle,
-                        enabled = !state.busy,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = AppDimensions.minimumTouchTarget),
-                        shape = BikeCarePillShape,
-                    ) {
-                        if (state.isGoogleLoading) {
-                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                            Spacer(Modifier.width(AppSpacing.xs))
-                        }
-                        Text(localizedString(R.string.auth_google))
-                    }
+
                 }
             }
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { footer() }

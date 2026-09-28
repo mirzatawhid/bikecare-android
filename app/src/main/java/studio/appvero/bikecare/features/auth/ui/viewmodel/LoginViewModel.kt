@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import studio.appvero.bikecare.R
 import studio.appvero.bikecare.features.auth.data.repository.AuthRepository
 import studio.appvero.bikecare.features.auth.ui.screen.*
 import javax.inject.Inject
@@ -30,17 +29,6 @@ class LoginViewModel @Inject constructor(private val repository: AuthRepository)
             _sideEffect.resetReplayCache()
             return
         }
-        when (event) {
-            is LoginEvent.GoogleTokenReceived -> {
-                if (_uiState.value.form.isGoogleLoading) authenticate { repository.signInWithGoogle(event.token) }
-                return
-            }
-            is LoginEvent.GoogleFailed -> {
-                update { it.copy(isGoogleLoading = false, error = event.message) }
-                return
-            }
-            else -> Unit
-        }
         if (_uiState.value.form.busy) return
         when (event) {
             is LoginEvent.EmailChanged -> update { it.copy(email = event.value, emailError = null, error = null, message = null) }
@@ -54,13 +42,9 @@ class LoginViewModel @Inject constructor(private val repository: AuthRepository)
                     authenticate { repository.login(validated.email, validated.password) }
                 }
             }
-            LoginEvent.GoogleSignIn -> {
-                update { it.copy(isGoogleLoading = true, error = null, message = null) }
-                _sideEffect.tryEmit(LoginSideEffect.LaunchGoogleSignIn)
-            }
+
             LoginEvent.Register -> _sideEffect.tryEmit(LoginSideEffect.NavigateToRegister)
-            LoginEvent.ResetPassword -> resetPassword()
-            else -> Unit
+            LoginEvent.ResetPassword -> _sideEffect.tryEmit(LoginSideEffect.NavigateToResetPassword)
         }
     }
 
@@ -72,30 +56,10 @@ class LoginViewModel @Inject constructor(private val repository: AuthRepository)
                 update { it.copy(password = "", confirmPassword = "") }
                 _sideEffect.emit(LoginSideEffect.NavigateToHome)
             } catch (cancelled: CancellationException) {
-                update { it.copy(isLoading = false, isGoogleLoading = false) }
+                update { it.copy(isLoading = false) }
                 throw cancelled
             } catch (error: Exception) {
-                update { it.copy(isLoading = false, isGoogleLoading = false, error = authError(error)) }
-            }
-        }
-    }
-
-    private fun resetPassword() {
-        val email = _uiState.value.form.email
-        val error = AuthValidation.emailError(email)
-        update { it.copy(emailError = error, error = null, message = null) }
-        if (error != null) return
-        update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                repository.sendPasswordReset(email)
-                update { it.copy(message = R.string.auth_reset_sent) }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (failure: Exception) {
-                update { it.copy(error = authError(failure)) }
-            } finally {
-                update { it.copy(isLoading = false) }
+                update { it.copy(isLoading = false, error = authError(error)) }
             }
         }
     }

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import studio.appvero.bikecare.R
+import studio.appvero.bikecare.core.localization.localizedString
 import studio.appvero.bikecare.ui.theme.AppDimensions
 import studio.appvero.bikecare.ui.theme.AppSpacing
 import studio.appvero.bikecare.ui.theme.AppTheme
@@ -45,14 +46,14 @@ fun SplashScreen(
     ) {
         Image(
             painter = painterResource(R.drawable.logo),
-            contentDescription = "BikeCare Logo",
+            contentDescription = null,
             modifier = Modifier.size(96.dp)
         )
 
         Spacer(modifier = Modifier.height(AppSpacing.md))
 
         Text(
-            text = "BikeCare",
+            text = localizedString(R.string.app_name),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -60,7 +61,7 @@ fun SplashScreen(
         Spacer(modifier = Modifier.height(AppSpacing.sm))
 
         Text(
-            text = "Your bike, cared for.",
+            text = localizedString(R.string.auth_tagline),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -81,7 +82,7 @@ fun SplashScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = uiState.message,
+                        text = localizedString(uiState.message),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center
@@ -99,7 +100,7 @@ fun SplashScreen(
                             onEvent(SplashEvent.Retry)
                         }
                     ) {
-                        Text(text = "Retry")
+                        Text(text = localizedString(R.string.auth_retry))
                     }
                 }
             }
@@ -120,7 +121,7 @@ private fun SplashScreenLoadingPreview() {
 private fun SplashScreenErrorPreview() {
     BikeCareTheme {
         SplashScreen(
-            uiState = SplashUiState.Error(message = "Unable to check authentication."),
+            uiState = SplashUiState.Error(message = R.string.auth_network_error),
             onEvent = {})
     }
 }

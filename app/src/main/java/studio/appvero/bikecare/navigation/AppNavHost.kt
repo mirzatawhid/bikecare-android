@@ -8,6 +8,7 @@ import studio.appvero.bikecare.features.auth.ui.screen.SplashRoute
 import studio.appvero.bikecare.features.auth.ui.screen.LoginRoute as LoginContent
 import studio.appvero.bikecare.features.auth.ui.screen.RegisterRoute as RegisterContent
 import studio.appvero.bikecare.features.auth.ui.screen.AuthSuccessScreen
+import studio.appvero.bikecare.features.auth.ui.screen.ResetPasswordRoute as ResetPasswordContent
 
 @Composable
 fun AppNavHost(
@@ -40,6 +41,9 @@ fun AppNavHost(
 
         composable<LoginRoute> {
             LoginContent(
+                onNavigateToResetPassword = {
+                    navController.navigate(ResetPasswordRoute) { launchSingleTop = true }
+                },
                 onNavigateToHome = {
                     navController.navigate(HomeRoute) {
                         popUpTo<LoginRoute> { inclusive = true }
@@ -66,6 +70,9 @@ fun AppNavHost(
 
         composable<HomeRoute> {
             AuthSuccessScreen()
+        }
+        composable<ResetPasswordRoute> {
+            ResetPasswordContent(onNavigateToLogin = { navController.popBackStack() })
         }
     }
 }

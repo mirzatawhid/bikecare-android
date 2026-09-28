@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import studio.appvero.bikecare.R
 import studio.appvero.bikecare.core.localization.localizedString
@@ -20,7 +19,6 @@ fun RegisterScreen(uiState: RegisterUiState, onEvent: (RegisterEvent) -> Unit) {
         state = form,
         submitLabel = localizedString(R.string.auth_create_account),
         onSubmit = { onEvent(RegisterEvent.Submit) },
-        onGoogle = { onEvent(RegisterEvent.GoogleSignIn) },
         footer = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(localizedString(R.string.auth_have_account), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -48,6 +46,7 @@ fun RegisterScreen(uiState: RegisterUiState, onEvent: (RegisterEvent) -> Unit) {
 
 @Preview(name = "Register light", widthDp = 412, showBackground = true)
 @Preview(name = "Register dark", widthDp = 412, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Bangla large text", widthDp = 412, locale = "bn", fontScale = 1.5f)
 @Composable
 private fun RegisterPreview() {
     BikeCareTheme { RegisterScreen(RegisterUiState(), {}) }

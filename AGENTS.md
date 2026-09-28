@@ -8,11 +8,11 @@ here and implementation detail in source; avoid duplicate guides.
 ## Current scope
 
 Single Android `app` module: Kotlin, Compose Material 3, MVVM, Hilt, typed
-Navigation Compose, Firebase Auth, and DataStore English/Bangla preferences.
-Login, registration, password reset, and Google sign-in exist; Home is temporary
-success content. Supabase dependencies and DI exist, but auth flows use Firebase.
-Bike/service/reminder storage, offline sync, Firestore, Firebase Storage, FCM,
-and Retrofit remain unimplemented. New dependencies require approval.
+Navigation Compose, Supabase Auth, and DataStore English/Bangla preferences.
+Email/password login, registration, and password recovery exist; Home is temporary
+success content. Supabase PostgREST and Storage share the authenticated client.
+Bike/service/reminder storage and offline sync remain unimplemented. Google
+sign-in is deferred. New dependencies require approval.
 
 ## Structure and flow
 
@@ -51,13 +51,14 @@ any `domain` package is for models. No UseCase/Interactor layers or parallel
 ## Data ownership
 
 Future business data must read locally first and persist writes before upload:
-`Repository -> Local storage -> Sync queue -> Firebase`. Define retries, conflicts,
+`Repository -> Local storage -> Sync queue -> Supabase`. Define retries, conflicts,
 sign-out, and account switching. Scope local records, queued work, and remote
-paths by authenticated Firebase uid (e.g. `users/{uid}/bikes/{bikeId}`); enforce
-ownership with backend security rules and test cross-user denial. A saved uid is
+paths by authenticated Supabase user ID (table `user_id`, object `{userId}/{fileId}`);
+enforce ownership with Postgres/Storage RLS using `auth.uid()` and test cross-user
+denial. A saved user ID is
 not authentication. Keep passwords and tokens out of DataStore/SavedStateHandle.
-Credential Manager account selection belongs at the route boundary; Firebase
-token exchange belongs in the repository.
+Authentication and recovery SDK calls belong in repositories. Recovery sessions
+must not persist or replace the normal authenticated session.
 
 ## UI and verification
 

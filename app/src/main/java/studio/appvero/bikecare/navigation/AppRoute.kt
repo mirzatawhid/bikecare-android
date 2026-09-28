@@ -12,6 +12,9 @@ data object LoginRoute
 data object RegisterRoute
 
 @Serializable
+data object ResetPasswordRoute
+
+@Serializable
 data object HomeRoute
 
 @Serializable

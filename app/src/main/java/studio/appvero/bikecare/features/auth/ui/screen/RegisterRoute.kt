@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -19,10 +18,9 @@ fun RegisterRoute(
     viewModel: RegisterViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     BackHandler(enabled = state.form.busy) { /* Wait for the active authentication request. */ }
-    LaunchedEffect(viewModel, context, lifecycle) {
+    LaunchedEffect(viewModel, lifecycle) {
         viewModel.sideEffect.collect { effect ->
             // Keep a pending navigation effect while the app is backgrounded.
             lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
@@ -30,11 +28,6 @@ fun RegisterRoute(
             when (effect) {
                 RegisterSideEffect.NavigateToHome -> onNavigateToHome()
                 RegisterSideEffect.NavigateToLogin -> onNavigateToLogin()
-                RegisterSideEffect.LaunchGoogleSignIn -> requestGoogleSignIn(
-                    context,
-                    onToken = { viewModel.onEvent(RegisterEvent.GoogleTokenReceived(it)) },
-                    onFailure = { viewModel.onEvent(RegisterEvent.GoogleFailed(it)) },
-                )
             }
         }
     }

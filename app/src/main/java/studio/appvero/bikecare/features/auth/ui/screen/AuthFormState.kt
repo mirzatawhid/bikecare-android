@@ -8,12 +8,11 @@ data class AuthFormState(
     val confirmPassword: String = "",
     val passwordVisible: Boolean = false,
     val isLoading: Boolean = false,
-    val isGoogleLoading: Boolean = false,
     @param:StringRes val emailError: Int? = null,
     @param:StringRes val passwordError: Int? = null,
     @param:StringRes val confirmPasswordError: Int? = null,
     @param:StringRes val error: Int? = null,
     @param:StringRes val message: Int? = null,
 ) {
-    val busy: Boolean get() = isLoading || isGoogleLoading
+    val busy: Boolean get() = isLoading
 }

@@ -20,7 +20,6 @@ fun LoginScreen(uiState: LoginUiState, onEvent: (LoginEvent) -> Unit) {
         state = form,
         submitLabel = localizedString(R.string.auth_sign_in),
         onSubmit = { onEvent(LoginEvent.Submit) },
-        onGoogle = { onEvent(LoginEvent.GoogleSignIn) },
         footer = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(localizedString(R.string.auth_new_account), color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -46,6 +45,7 @@ fun LoginScreen(uiState: LoginUiState, onEvent: (LoginEvent) -> Unit) {
 
 @Preview(name = "Login light", widthDp = 412, showBackground = true)
 @Preview(name = "Login dark", widthDp = 412, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Bangla large text", widthDp = 412, locale = "bn", fontScale = 1.5f)
 @Composable
 private fun LoginPreview() {
     BikeCareTheme { LoginScreen(LoginUiState(), {}) }

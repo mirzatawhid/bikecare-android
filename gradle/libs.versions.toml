@@ -1,10 +1,8 @@
 [versions]
+ktor = "3.5.1"
 authKt = "3.8.0"
-credentials = "1.3.0"
-googleId = "1.1.1"
 agp = "9.4.0"
 coreKtx = "1.10.1"
-firebaseBom = "34.19.0"
 hiltLifecycleViewmodelCompose = "1.4.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -12,30 +10,25 @@ espressoCore = "3.5.1"
 kotlinxSerializationJson = "1.11.0"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
-kotlin = "2.2.10"
+kotlin = "2.4.0"
 composeBom = "2026.02.01"
-ksp = "2.2.10-2.0.2"
+ksp = "2.3.10"
 hilt = "2.60.1"
 datastorePreferences = "1.2.1"
 material3 = "1.4.0"
 navigationCompose = "2.10.1"
-firebaseAuth = "24.2.0"
 postgrestKt = "3.8.0"
 storageKt = "3.8.0"
 
 [libraries]
-androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
-androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "authKt" }
-google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleId" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "hiltLifecycleViewmodelCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -51,7 +44,6 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "postgrestKt" }
 storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "storageKt" }
 

@@ -5,11 +5,12 @@ sealed interface SplashUiState {
     data object Loading : SplashUiState
 
     data class Error(
-        val message: String
+        @param:androidx.annotation.StringRes val message: Int
     ) : SplashUiState
 }
 
 sealed interface SplashEvent {
+    data object EffectHandled : SplashEvent
 
     data object CheckAuthentication : SplashEvent
 

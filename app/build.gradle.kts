@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.ksp)
 
     id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
 }
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
@@ -73,12 +72,9 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services)
-    implementation(libs.google.identity)
+    implementation(libs.ktor.client.android)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.material3)
-    implementation(libs.firebase.auth)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     ksp(libs.hilt.compiler)
@@ -93,8 +89,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
 
     implementation(libs.postgrest.kt)
     implementation(libs.storage.kt)

@@ -12,21 +12,22 @@ import studio.appvero.bikecare.ui.theme.BikeCareTheme
 class AuthScreensTest {
     @get:Rule val compose = createComposeRule()
 
-    @Test fun loginOffersRegistrationAndGoogleSignIn() {
+    @Test fun loginOffersRegistrationAndPasswordRecovery() {
         val events = mutableListOf<LoginEvent>()
         compose.setContent { BikeCareTheme { LoginScreen(LoginUiState(), events::add) } }
-        compose.onNodeWithText("Sign in with Google").performScrollTo().performClick()
+        compose.onNodeWithText("Sign in with Google").assertDoesNotExist()
+        compose.onNodeWithText("Forgot password?").performScrollTo().performClick()
         compose.onNodeWithText("Create account").performScrollTo().performClick()
-        assertTrue(events.contains(LoginEvent.GoogleSignIn))
+        assertTrue(events.contains(LoginEvent.ResetPassword))
         assertTrue(events.contains(LoginEvent.Register))
     }
 
-    @Test fun inFlightGoogleRequestDisablesOtherActions() {
+    @Test fun inFlightRequestDisablesOtherActions() {
         compose.setContent {
-            BikeCareTheme { LoginScreen(LoginUiState(AuthFormState(isGoogleLoading = true)), {}) }
+            BikeCareTheme { LoginScreen(LoginUiState(AuthFormState(isLoading = true)), {}) }
         }
-        compose.onNodeWithText("Sign in").assertIsNotEnabled()
-        compose.onNodeWithText("Sign in with Google").assertIsNotEnabled()
+        compose.onNodeWithText("Please wait…").assertIsNotEnabled()
+        compose.onNodeWithText("Forgot password?").assertIsNotEnabled()
         compose.onNodeWithText("Create account").assertIsNotEnabled()
     }
 
@@ -40,5 +41,19 @@ class AuthScreensTest {
         compose.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Password)).assertCountEquals(2)
         compose.onAllNodesWithText("Show")[0].performScrollTo().performClick()
         assertTrue(events.contains(RegisterEvent.TogglePasswordVisibility))
+    }
+
+    @Test fun recoveryRequiresCodeAndMasksBothPasswords() {
+        val events = mutableListOf<ResetPasswordEvent>()
+        compose.setContent {
+            BikeCareTheme {
+                ResetPasswordScreen(ResetPasswordUiState(step = PasswordResetStep.CodeAndPassword), events::add)
+            }
+        }
+        compose.onNodeWithText("Reset code").performScrollTo().performTextInput("123456")
+        assertTrue(events.contains(ResetPasswordEvent.CodeChanged("123456")))
+        compose.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Password)).assertCountEquals(2)
+        compose.onNodeWithText("Update password").performScrollTo().performClick()
+        assertTrue(events.contains(ResetPasswordEvent.Submit))
     }
 }
