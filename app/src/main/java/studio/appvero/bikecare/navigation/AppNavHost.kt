@@ -5,6 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import studio.appvero.bikecare.features.auth.ui.screen.SplashRoute
+import studio.appvero.bikecare.features.auth.ui.screen.LoginRoute as LoginContent
+import studio.appvero.bikecare.features.auth.ui.screen.RegisterRoute as RegisterContent
+import studio.appvero.bikecare.features.auth.ui.screen.AuthSuccessScreen
 
 @Composable
 fun AppNavHost(
@@ -36,11 +39,33 @@ fun AppNavHost(
         }
 
         composable<LoginRoute> {
-            // LoginRoute(...)
+            LoginContent(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo<LoginRoute> { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(RegisterRoute) { launchSingleTop = true }
+                },
+            )
+        }
+
+        composable<RegisterRoute> {
+            RegisterContent(
+                onNavigateToHome = {
+                    navController.navigate(HomeRoute) {
+                        popUpTo<LoginRoute> { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToLogin = { navController.popBackStack() },
+            )
         }
 
         composable<HomeRoute> {
-            // HomeRoute(...)
+            AuthSuccessScreen()
         }
     }
 }

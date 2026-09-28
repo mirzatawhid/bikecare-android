@@ -1,5 +1,13 @@
 # Testing Guide
 
+## Authentication coverage update
+
+`AuthValidationTest` now covers malformed email, registration password length,
+confirmation mismatch, existing-password login, whitespace, and corrected inputs.
+`AuthScreensTest` covers Google/registration actions, busy controls, and password
+masking/visibility events. See [AUTH_SETUP.md](AUTH_SETUP.md) for commands and
+live Firebase checks. The coverage baseline below predates these additions.
+
 ## Current coverage
 
 The project contains only the generated `ExampleUnitTest` (arithmetic) and

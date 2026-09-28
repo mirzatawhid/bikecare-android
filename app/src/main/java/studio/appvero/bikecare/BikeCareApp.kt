@@ -19,10 +19,6 @@ fun BikeCareApp(
 
     ProvideLocalization(language) {
 
-        ProvideLocalization(language) {
-            AppNavHost(
-                navController = navController
-            )
-        }
+        AppNavHost(navController = navController)
     }
 }

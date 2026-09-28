@@ -1,5 +1,19 @@
 # BikeCare Architecture
 
+## Authentication update
+
+Login and registration now have contracts, routes, screens, and ViewModels in
+the auth feature. AuthRepository supports Firebase email login, registration,
+password reset, and Google token exchange. Credential Manager account selection
+lives at the route boundary. MainActivity has `@AndroidEntryPoint`, typed route
+serialization is enabled, and the duplicate localization provider is removed.
+Home currently displays a temporary signed-in message. See [AUTH_SETUP.md](AUTH_SETUP.md)
+for configuration, current behavior, and verification instructions.
+
+The baseline and gap list below record the earlier splash-only source review;
+the authentication update above supersedes its login, Home, Hilt, serialization,
+and duplicate-localization observations. Other splash gaps remain follow-up work.
+
 ## Implementation baseline
 
 BikeCare currently has one Android module, `app`, using feature-first MVVM with

@@ -11,7 +11,9 @@ import androidx.compose.ui.Modifier
 import studio.appvero.bikecare.core.localization.LanguageManager
 import studio.appvero.bikecare.ui.theme.BikeCareTheme
 import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     @Inject

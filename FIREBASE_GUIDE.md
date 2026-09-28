@@ -1,5 +1,15 @@
 # Firebase Guide
 
+## Authentication update
+
+Email/password login, registration, password reset, and Google sign-in are now
+implemented. Credential Manager supplies a Google token and AuthRepository
+exchanges it with Firebase Auth. MainActivity now has `@AndroidEntryPoint`.
+See [AUTH_SETUP.md](AUTH_SETUP.md) for the required provider/fingerprint/OAuth
+configuration. The earlier baseline below describes the pre-auth implementation;
+its missing authentication flows and activity annotation have been addressed.
+Sign-out, Firestore, Storage, FCM, and business-data synchronization remain future work.
+
 ## Implemented integration
 
 The app declares Firebase Auth and Analytics dependencies and the Firebase BOM.
