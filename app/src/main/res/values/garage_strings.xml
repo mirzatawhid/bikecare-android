@@ -1,0 +1,27 @@
+<resources>
+    <string name="nav_home">Home</string>
+    <string name="nav_care">Care</string>
+    <string name="nav_garage">Garage</string>
+    <string name="nav_more">More</string>
+    <string name="home_intro">Your bike care starts here. Open Garage to see your motorcycles.</string>
+    <string name="care_placeholder">Maintenance tracking and reminders are coming soon.</string>
+    <string name="more_intro">Manage your BikeCare session.</string>
+    <string name="garage_subtitle">Your motorcycles, all in one place.</string>
+    <string name="garage_empty">No bikes added yet</string>
+    <string name="garage_empty_body">Add your first motorcycle to get started.</string>
+    <string name="garage_add_bike">Add bike</string>
+    <string name="garage_loading">Loading your bikes…</string>
+    <string name="garage_retry">Try again</string>
+    <string name="garage_network_error">Network unavailable. Check your connection and try again.</string>
+    <string name="garage_permission_error">Permission denied. Verify your email and sign in again. If this continues, contact support.</string>
+    <string name="garage_auth_error">Authentication expired. Please sign in again.</string>
+    <string name="garage_data_error">Some bike details could not be loaded. Please contact support.</string>
+    <string name="garage_generic_error">We could not load your bikes. Please try again.</string>
+    <string name="garage_year">Model year: %1$d</string>
+    <string name="garage_odometer">Odometer: %1$d km</string>
+    <string name="garage_unregistered">Registration not added</string>
+    <string name="garage_active">Active</string>
+    <string name="garage_inactive">Inactive</string>
+    <string name="garage_add_placeholder">The add bike form is coming soon. You will be able to enter your motorcycle details here.</string>
+    <string name="garage_back">Back to Garage</string>
+</resources>

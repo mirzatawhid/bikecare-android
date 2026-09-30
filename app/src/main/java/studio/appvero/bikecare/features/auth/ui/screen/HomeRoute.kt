@@ -15,6 +15,7 @@ fun HomeRoute(
     onNavigateToLogin: () -> Unit,
     onNavigateToVerifyEmail: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
+    content: @Composable (HomeUiState, (HomeEvent) -> Unit) -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -34,5 +35,5 @@ fun HomeRoute(
             }
         }
     }
-    AuthSuccessScreen(state, viewModel::onEvent)
+    content(state, viewModel::onEvent)
 }

@@ -21,6 +21,9 @@ data class VerifyEmailRoute(val sendEmail: Boolean = false)
 data object HomeRoute
 
 @Serializable
+data object DashboardRoute
+
+@Serializable
 data object BikesRoute
 
 @Serializable

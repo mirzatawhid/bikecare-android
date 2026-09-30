@@ -1,6 +1,11 @@
 package studio.appvero.bikecare.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,6 +15,11 @@ import studio.appvero.bikecare.features.auth.ui.screen.RegisterRoute as Register
 import studio.appvero.bikecare.features.auth.ui.screen.ForgotPasswordRoute as ForgotPasswordContent
 import studio.appvero.bikecare.features.auth.ui.screen.VerifyEmailRoute as VerifyEmailContent
 import studio.appvero.bikecare.features.auth.ui.screen.HomeRoute as HomeContent
+import studio.appvero.bikecare.features.home.ui.screen.HomeScreen
+import studio.appvero.bikecare.features.home.ui.screen.HomeTab
+import studio.appvero.bikecare.features.home.ui.screen.HomeTabScreen
+import studio.appvero.bikecare.features.garage.ui.screen.GarageRoute as GarageContent
+import studio.appvero.bikecare.features.garage.ui.screen.AddBikeScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -56,7 +66,40 @@ fun AppNavHost(navController: NavHostController) {
             HomeContent(
                 onNavigateToLogin = { replaceRoot(LoginRoute) },
                 onNavigateToVerifyEmail = { replaceRoot(VerifyEmailRoute()) },
-            )
+            ) { state, onEvent ->
+                val homeController = rememberNavController()
+                val entry by homeController.currentBackStackEntryAsState()
+                val destination = entry?.destination
+                val selected = when {
+                    destination?.hasRoute<MaintenanceRoute>() == true -> HomeTab.Care
+                    destination?.hasRoute<BikesRoute>() == true || destination?.hasRoute<AddBikeRoute>() == true -> HomeTab.Garage
+                    destination?.hasRoute<ProfileRoute>() == true -> HomeTab.More
+                    else -> HomeTab.Home
+                }
+                HomeScreen(selected, destination?.hasRoute<AddBikeRoute>() != true, onSelectTab = { tab ->
+                    val route: Any = when (tab) {
+                        HomeTab.Home -> DashboardRoute
+                        HomeTab.Care -> MaintenanceRoute
+                        HomeTab.Garage -> BikesRoute
+                        HomeTab.More -> ProfileRoute
+                    }
+                    homeController.navigate(route) {
+                        popUpTo(homeController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }) {
+                    NavHost(homeController, startDestination = DashboardRoute) {
+                        composable<DashboardRoute> { HomeTabScreen(HomeTab.Home, state, onEvent) }
+                        composable<MaintenanceRoute> { HomeTabScreen(HomeTab.Care, state, onEvent) }
+                        composable<BikesRoute> {
+                            GarageContent(onNavigateToAddBike = { homeController.navigate(AddBikeRoute) { launchSingleTop = true } })
+                        }
+                        composable<ProfileRoute> { HomeTabScreen(HomeTab.More, state, onEvent) }
+                        composable<AddBikeRoute> { AddBikeScreen(onBack = { homeController.popBackStack() }) }
+                    }
+                }
+            }
         }
     }
 }
