@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import studio.appvero.bikecare.R
-import studio.appvero.bikecare.features.auth.data.repository.RegistrationResult
+import studio.appvero.bikecare.features.auth.data.model.AuthUser
 import studio.appvero.bikecare.features.auth.data.repository.AuthRepository
 import studio.appvero.bikecare.features.auth.ui.screen.*
 import javax.inject.Inject
@@ -50,17 +49,13 @@ class RegisterViewModel @Inject constructor(private val repository: AuthReposito
         }
     }
 
-    private fun authenticate(operation: suspend () -> RegistrationResult) {
+    private fun authenticate(operation: suspend () -> AuthUser) {
         viewModelScope.launch {
             try {
-                val result = operation()
-                // Clear passwords after success; never persist them in saved state.
+                operation()
+                // Delivery is independent of signup so a retry never recreates the account.
                 update { it.copy(password = "", confirmPassword = "") }
-                if (result == RegistrationResult.SignedIn) {
-                    _sideEffect.emit(RegisterSideEffect.NavigateToHome)
-                } else {
-                    update { it.copy(isLoading = false, message = R.string.auth_confirmation_required) }
-                }
+                _sideEffect.emit(RegisterSideEffect.NavigateToVerifyEmail(sendEmail = true))
             } catch (cancelled: CancellationException) {
                 update { it.copy(isLoading = false) }
                 throw cancelled

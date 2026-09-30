@@ -18,6 +18,7 @@ sealed interface SplashEvent {
 }
 
 sealed interface SplashSideEffect {
+    data object NavigateToVerifyEmail : SplashSideEffect
 
     data object NavigateToHome : SplashSideEffect
 

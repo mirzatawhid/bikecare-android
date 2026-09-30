@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import studio.appvero.bikecare.core.localization.LanguageManager
 import studio.appvero.bikecare.features.auth.data.repository.AuthRepository
@@ -44,9 +45,13 @@ class SplashViewModel @Inject constructor(
             _uiState.value = SplashUiState.Loading
             try {
                 languageManager.initialize()
-                val loggedIn = authRepository.isUserLoggedIn()
+                val user = authRepository.observeAuthState().first()
                 navigationPending = true
-                _sideEffect.emit(if (loggedIn) SplashSideEffect.NavigateToHome else SplashSideEffect.NavigateToLogin)
+                _sideEffect.emit(when {
+                    user == null -> SplashSideEffect.NavigateToLogin
+                    !user.isEmailVerified -> SplashSideEffect.NavigateToVerifyEmail
+                    else -> SplashSideEffect.NavigateToHome
+                })
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {

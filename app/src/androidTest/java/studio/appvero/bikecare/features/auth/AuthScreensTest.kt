@@ -43,17 +43,15 @@ class AuthScreensTest {
         assertTrue(events.contains(RegisterEvent.TogglePasswordVisibility))
     }
 
-    @Test fun recoveryRequiresCodeAndMasksBothPasswords() {
-        val events = mutableListOf<ResetPasswordEvent>()
+    @Test fun recoveryRequestsHostedEmailLink() {
+        val events = mutableListOf<ForgotPasswordEvent>()
         compose.setContent {
-            BikeCareTheme {
-                ResetPasswordScreen(ResetPasswordUiState(step = PasswordResetStep.CodeAndPassword), events::add)
-            }
+            BikeCareTheme { ForgotPasswordScreen(ForgotPasswordUiState(), events::add) }
         }
-        compose.onNodeWithText("Reset code").performScrollTo().performTextInput("123456")
-        assertTrue(events.contains(ResetPasswordEvent.CodeChanged("123456")))
-        compose.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Password)).assertCountEquals(2)
-        compose.onNodeWithText("Update password").performScrollTo().performClick()
-        assertTrue(events.contains(ResetPasswordEvent.Submit))
+        compose.onNodeWithText("Email address").performScrollTo().performTextInput("rider@example.com")
+        assertTrue(events.contains(ForgotPasswordEvent.EmailChanged("rider@example.com")))
+        compose.onNodeWithText("Reset code").assertDoesNotExist()
+        compose.onNodeWithText("Send reset email").performScrollTo().performClick()
+        assertTrue(events.contains(ForgotPasswordEvent.Submit))
     }
 }

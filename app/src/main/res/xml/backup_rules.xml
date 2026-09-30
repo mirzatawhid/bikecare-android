@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <!-- Back up language preferences only, never Supabase session preferences. -->
+    <!-- Back up language preferences only, never authentication session preferences. -->
     <include domain="file" path="datastore/" />
 </full-backup-content>

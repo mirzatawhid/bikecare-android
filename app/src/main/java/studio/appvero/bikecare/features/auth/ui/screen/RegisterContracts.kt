@@ -13,6 +13,6 @@ sealed interface RegisterEvent {
 }
 
 sealed interface RegisterSideEffect {
-    data object NavigateToHome : RegisterSideEffect
+    data class NavigateToVerifyEmail(val sendEmail: Boolean) : RegisterSideEffect
     data object NavigateToLogin : RegisterSideEffect
 }

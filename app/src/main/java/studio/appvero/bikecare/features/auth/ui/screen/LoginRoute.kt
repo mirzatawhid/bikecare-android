@@ -14,6 +14,7 @@ import studio.appvero.bikecare.features.auth.ui.viewmodel.LoginViewModel
 @Composable
 fun LoginRoute(
     onNavigateToHome: () -> Unit,
+    onNavigateToVerifyEmail: () -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateToResetPassword: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel(),
@@ -28,6 +29,7 @@ fun LoginRoute(
             viewModel.onEvent(LoginEvent.EffectHandled)
             when (effect) {
                 LoginSideEffect.NavigateToResetPassword -> onNavigateToResetPassword()
+                LoginSideEffect.NavigateToVerifyEmail -> onNavigateToVerifyEmail()
                 LoginSideEffect.NavigateToHome -> onNavigateToHome()
                 LoginSideEffect.NavigateToRegister -> onNavigateToRegister()
             }

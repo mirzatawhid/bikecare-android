@@ -12,6 +12,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 @Composable
 fun SplashRoute(
     onNavigateToHome: () -> Unit,
+    onNavigateToVerifyEmail: () -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: SplashViewModel = hiltViewModel()
 ) {
@@ -23,6 +24,7 @@ fun SplashRoute(
             lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
             viewModel.onEvent(SplashEvent.EffectHandled)
             when (effect) {
+                SplashSideEffect.NavigateToVerifyEmail -> onNavigateToVerifyEmail()
                 SplashSideEffect.NavigateToHome -> {
                     onNavigateToHome()
                 }

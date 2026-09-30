@@ -12,7 +12,10 @@ data object LoginRoute
 data object RegisterRoute
 
 @Serializable
-data object ResetPasswordRoute
+data object ForgotPasswordRoute
+
+@Serializable
+data class VerifyEmailRoute(val sendEmail: Boolean = false)
 
 @Serializable
 data object HomeRoute

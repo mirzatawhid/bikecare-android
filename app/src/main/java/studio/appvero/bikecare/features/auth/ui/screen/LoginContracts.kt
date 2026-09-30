@@ -13,6 +13,7 @@ sealed interface LoginEvent {
 }
 
 sealed interface LoginSideEffect {
+    data object NavigateToVerifyEmail : LoginSideEffect
     data object NavigateToResetPassword : LoginSideEffect
     data object NavigateToHome : LoginSideEffect
     data object NavigateToRegister : LoginSideEffect

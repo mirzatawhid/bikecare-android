@@ -13,7 +13,7 @@ import studio.appvero.bikecare.features.auth.ui.viewmodel.RegisterViewModel
 
 @Composable
 fun RegisterRoute(
-    onNavigateToHome: () -> Unit,
+    onNavigateToVerifyEmail: (Boolean) -> Unit,
     onNavigateToLogin: () -> Unit,
     viewModel: RegisterViewModel = hiltViewModel(),
 ) {
@@ -26,7 +26,7 @@ fun RegisterRoute(
             lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
             viewModel.onEvent(RegisterEvent.EffectHandled)
             when (effect) {
-                RegisterSideEffect.NavigateToHome -> onNavigateToHome()
+                is RegisterSideEffect.NavigateToVerifyEmail -> onNavigateToVerifyEmail(effect.sendEmail)
                 RegisterSideEffect.NavigateToLogin -> onNavigateToLogin()
             }
         }

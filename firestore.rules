@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Version 2 recursive matching includes users/{uid} itself and descendants.
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == uid
+        && request.auth.token.email_verified == true;
+    }
+    // Unmatched paths are denied. Do not add a permissive catch-all rule.
+  }
+}

@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import studio.appvero.bikecare.features.auth.data.repository.AuthRepository
 import studio.appvero.bikecare.features.auth.ui.screen.*
 import javax.inject.Inject
+import studio.appvero.bikecare.features.auth.data.model.AuthUser
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val repository: AuthRepository) : ViewModel() {
@@ -48,13 +49,13 @@ class LoginViewModel @Inject constructor(private val repository: AuthRepository)
         }
     }
 
-    private fun authenticate(operation: suspend () -> Unit) {
+    private fun authenticate(operation: suspend () -> AuthUser) {
         viewModelScope.launch {
             try {
-                operation()
+                val user = operation()
                 // Clear passwords after success; never persist them in saved state.
                 update { it.copy(password = "", confirmPassword = "") }
-                _sideEffect.emit(LoginSideEffect.NavigateToHome)
+                _sideEffect.emit(if (user.isEmailVerified) LoginSideEffect.NavigateToHome else LoginSideEffect.NavigateToVerifyEmail)
             } catch (cancelled: CancellationException) {
                 update { it.copy(isLoading = false) }
                 throw cancelled
