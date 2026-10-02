@@ -9,14 +9,18 @@ service cloud.firestore {
 
     function validBike(bikeId) {
       let bike = request.resource.data;
-      return bike.keys().hasAll(['id', 'brand', 'model', 'year', 'registrationNumber',
+      return bike.keys().hasAll(['id', 'brand', 'model', 'nickname', 'year', 'engineCapacityCc', 'registrationNumber',
           'initialOdometer', 'currentOdometer', 'imageUrl', 'createdAt', 'updatedAt', 'isActive'])
-        && bike.keys().hasOnly(['id', 'brand', 'model', 'year', 'registrationNumber',
+        && bike.keys().hasOnly(['id', 'brand', 'model', 'nickname', 'year', 'engineCapacityCc', 'registrationNumber',
           'initialOdometer', 'currentOdometer', 'imageUrl', 'createdAt', 'updatedAt', 'isActive'])
         && bike.id == bikeId && bikeId.size() > 0 && bikeId.size() <= 128
         && bike.brand is string && bike.brand.size() > 0 && bike.brand.size() <= 100
         && bike.model is string && bike.model.size() > 0 && bike.model.size() <= 100
+        && (bike.nickname == null || (bike.nickname is string && bike.nickname.size() > 0
+          && bike.nickname.size() <= 50))
         && bike.year is int && bike.year >= 1885 && bike.year <= 2100
+        && (bike.engineCapacityCc == null || (bike.engineCapacityCc is int
+          && bike.engineCapacityCc >= 1 && bike.engineCapacityCc <= 3000))
         && bike.registrationNumber is string && bike.registrationNumber.size() <= 50
         && bike.initialOdometer is int && bike.initialOdometer >= 0
         && bike.currentOdometer is int && bike.currentOdometer >= bike.initialOdometer

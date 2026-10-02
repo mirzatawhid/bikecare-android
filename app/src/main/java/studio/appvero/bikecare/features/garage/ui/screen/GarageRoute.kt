@@ -1,25 +1,35 @@
 package studio.appvero.bikecare.features.garage.ui.screen
 
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.first
+import studio.appvero.bikecare.R
+import studio.appvero.bikecare.core.localization.localizedString
 import studio.appvero.bikecare.features.garage.ui.viewmodel.GarageViewModel
 
 @Composable
-fun GarageRoute(onNavigateToAddBike: () -> Unit, viewModel: GarageViewModel = hiltViewModel()) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    LaunchedEffect(viewModel, lifecycle) {
+fun GarageRoute(viewModel: GarageViewModel = hiltViewModel()) {
+    val state = viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val bikeAddedMessage = localizedString(R.string.garage_bike_saved)
+
+    LaunchedEffect(viewModel, bikeAddedMessage) {
         viewModel.sideEffect.collect { effect ->
-            lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
-            viewModel.onEvent(GarageEvent.EffectHandled)
             when (effect) {
-                GarageSideEffect.NavigateToAddBike -> onNavigateToAddBike()
+                GarageSideEffect.BikeAdded -> snackbarHostState.showSnackbar(bikeAddedMessage)
             }
         }
     }
-    GarageScreen(state, viewModel::onEvent)
+
+    Box(Modifier.fillMaxSize()) {
+        GarageScreen(state.value, viewModel::onEvent)
+        SnackbarHost(hostState = snackbarHostState)
+    }
 }

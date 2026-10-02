@@ -22,6 +22,25 @@
     <string name="garage_unregistered">Registration not added</string>
     <string name="garage_active">Active</string>
     <string name="garage_inactive">Inactive</string>
-    <string name="garage_add_placeholder">The add bike form is coming soon. You will be able to enter your motorcycle details here.</string>
-    <string name="garage_back">Back to Garage</string>
+    <string name="garage_add_sheet_title">Add your motorcycle</string>
+    <string name="garage_close_sheet">Close add motorcycle form</string>
+    <string name="garage_make_model">Make &amp; model</string>
+    <string name="garage_make_model_hint">e.g. Yamaha FZ-S FI</string>
+    <string name="garage_nickname_optional">Nickname (optional)</string>
+    <string name="garage_nickname_hint">e.g. My daily ride</string>
+    <string name="garage_model_year">Model year</string>
+    <string name="garage_engine_optional">Engine (cc, optional)</string>
+    <string name="garage_odometer_input">Odometer (km)</string>
+    <string name="garage_registration_optional">Registration number (optional)</string>
+    <string name="garage_save_bike">Save bike</string>
+    <string name="garage_bike_saved">Bike saved</string>
+    <string name="garage_make_model_error">Enter both the make and model.</string>
+    <string name="garage_year_error">Enter a valid model year.</string>
+    <string name="garage_engine_error">Enter an engine capacity from 1 to 3,000 cc.</string>
+    <string name="garage_odometer_error">Enter an odometer reading from 0 to 10,000,000 km.</string>
+    <string name="garage_registration_error">Registration number can be at most 50 characters.</string>
+    <string name="garage_save_network_error">Could not save the bike. Check your connection and try again.</string>
+    <string name="garage_save_invalid_error">Some bike details are invalid. Please review them and try again.</string>
+    <string name="garage_save_generic_error">Could not save the bike. Please try again.</string>
+    <string name="garage_engine">Engine: %1$d cc</string>
 </resources>

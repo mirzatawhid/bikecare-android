@@ -15,6 +15,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import studio.appvero.bikecare.R
 import studio.appvero.bikecare.core.localization.localizedString
+import studio.appvero.bikecare.ui.components.BikeCarePrimaryButton
 import studio.appvero.bikecare.ui.theme.*
 
 @Composable
@@ -54,19 +55,12 @@ internal fun AuthLayout(
                     fields()
                     state.error?.let { AuthNotice(localizedString(it), isError = true) }
                     state.message?.let { AuthNotice(localizedString(it), isError = false) }
-                    Button(
+                    BikeCarePrimaryButton(
+                        text = if (state.isLoading) localizedString( R.string.auth_please_wait) else submitLabel,
                         onClick = onSubmit,
                         enabled = !state.busy,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = AppDimensions.minimumTouchTarget),
-                        shape = BikeCarePillShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.action, contentColor = AppTheme.colors.onAction),
-                    ) {
-                        if (state.isLoading) {
-                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                            Spacer(Modifier.width(AppSpacing.xs))
-                            Text(localizedString(R.string.auth_please_wait))
-                        } else Text(submitLabel)
-                    }
+                        isLoading = state.isLoading,
+                    )
 
                 }
             }

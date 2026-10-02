@@ -32,9 +32,6 @@ data class BikeDetailRoute(
 )
 
 @Serializable
-data object AddBikeRoute
-
-@Serializable
 data object MaintenanceRoute
 
 @Serializable

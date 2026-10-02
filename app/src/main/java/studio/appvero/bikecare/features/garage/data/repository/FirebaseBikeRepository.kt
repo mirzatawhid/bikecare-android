@@ -1,6 +1,5 @@
 package studio.appvero.bikecare.features.garage.data.repository
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
@@ -33,7 +32,6 @@ class FirebaseBikeRepository @Inject constructor(
 ) : BikeRepository {
     private fun requireUid(): String {
         val user = auth.currentUser ?: throw BikeException(BikeFailure.AuthenticationExpired)
-        Log.d("BikeRepository", "mapError: ${user.isEmailVerified}")
         if (!user.isEmailVerified) throw BikeException(BikeFailure.PermissionDenied)
         return user.uid
     }
@@ -90,7 +88,9 @@ class FirebaseBikeRepository @Inject constructor(
                 "id" to bike.id,
                 "brand" to bike.brand.trim(),
                 "model" to bike.model.trim(),
+                "nickname" to bike.nickname?.trim(),
                 "year" to bike.year,
+                "engineCapacityCc" to bike.engineCapacityCc,
                 "registrationNumber" to bike.registrationNumber.trim(),
                 "initialOdometer" to bike.initialOdometer,
                 "currentOdometer" to bike.currentOdometer,
@@ -132,7 +132,9 @@ class FirebaseBikeRepository @Inject constructor(
     private fun validate(bike: Bike) {
         validateId(bike.id)
         if (bike.brand.trim().length !in 1..100 || bike.model.trim().length !in 1..100 ||
+            (bike.nickname != null && bike.nickname.trim().length !in 1..50) ||
             bike.year !in 1885..2100 || bike.registrationNumber.trim().length > 50 ||
+            (bike.engineCapacityCc != null && bike.engineCapacityCc !in 1..3000) ||
             bike.initialOdometer < 0 || bike.currentOdometer < bike.initialOdometer ||
             bike.currentOdometer > 10_000_000 ||
             (bike.imageUrl != null && (!bike.imageUrl.startsWith("https://") || bike.imageUrl.length > 2048))
@@ -146,9 +148,11 @@ class FirebaseBikeRepository @Inject constructor(
             id = id,
             brand = getString("brand") ?: throw BikeException(BikeFailure.InvalidData),
             model = getString("model") ?: throw BikeException(BikeFailure.InvalidData),
+            nickname = getString("nickname"),
             year = (getLong("year") ?: throw BikeException(BikeFailure.InvalidData)).also {
                 if (it !in 1885L..2100L) throw BikeException(BikeFailure.InvalidData)
             }.toInt(),
+            engineCapacityCc = getLong("engineCapacityCc")?.toInt(),
             registrationNumber = getString("registrationNumber")
                 ?: throw BikeException(BikeFailure.InvalidData),
             initialOdometer = getLong("initialOdometer")
@@ -178,7 +182,6 @@ class FirebaseBikeRepository @Inject constructor(
     private fun mapError(error: Exception): BikeException {
         if (error is BikeException) return error
         if (error.cause is BikeException) return error.cause as BikeException
-        Log.d("BikeRepository", "mapError: $error")
         return BikeException(
             when ((error as? FirebaseFirestoreException)?.code) {
                 FirebaseFirestoreException.Code.UNAVAILABLE, FirebaseFirestoreException.Code.DEADLINE_EXCEEDED -> BikeFailure.Network

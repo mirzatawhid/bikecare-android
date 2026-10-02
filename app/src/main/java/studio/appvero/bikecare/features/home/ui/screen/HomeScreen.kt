@@ -11,6 +11,7 @@ import studio.appvero.bikecare.R
 import studio.appvero.bikecare.core.localization.localizedString
 import studio.appvero.bikecare.features.auth.ui.screen.HomeEvent
 import studio.appvero.bikecare.features.auth.ui.screen.HomeUiState
+import studio.appvero.bikecare.ui.components.BikeCarePrimaryButton
 import studio.appvero.bikecare.ui.theme.*
 
 enum class HomeTab(val label: Int, val icon: Int) {
@@ -48,11 +49,12 @@ fun HomeTabScreen(tab: HomeTab, state: HomeUiState, onEvent: (HomeEvent) -> Unit
         }), color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (tab == HomeTab.More) {
             state.form.error?.let { Text(localizedString(it), color = MaterialTheme.colorScheme.error) }
-            Button(onClick = { onEvent(HomeEvent.Logout) }, enabled = !state.form.busy,
-                modifier = Modifier.heightIn(min = AppDimensions.minimumTouchTarget),
-                colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.action, contentColor = AppTheme.colors.onAction)) {
-                Text(localizedString(if (state.form.busy) R.string.auth_please_wait else R.string.auth_sign_out))
-            }
+            BikeCarePrimaryButton(
+                text = localizedString(if (state.form.busy) R.string.auth_please_wait else R.string.auth_sign_out),
+                onClick = { onEvent(HomeEvent.Logout) },
+                enabled = !state.form.busy,
+                isLoading = state.form.isLoading,
+            )
         }
     }
 }
