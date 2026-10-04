@@ -3,13 +3,12 @@ package studio.appvero.bikecare.features.garage.ui.screen
 import androidx.annotation.StringRes
 import studio.appvero.bikecare.features.garage.domain.model.Bike
 
-data class GarageUiState(
-    val bikes: List<Bike> = emptyList(),
-    val isLoading: Boolean = true,
-    @param:StringRes val error: Int? = null,
-    val isAddBikeSheetVisible: Boolean = false,
-    val addBikeForm: AddBikeFormState = AddBikeFormState(),
-)
+sealed interface GarageUiState {
+    data object Loading : GarageUiState
+    data object Empty : GarageUiState
+    data class Content(val bikes: List<Bike>) : GarageUiState
+    data class Error(@param:StringRes val message: Int) : GarageUiState
+}
 
 data class AddBikeFormState(
     val makeAndModel: String = "",

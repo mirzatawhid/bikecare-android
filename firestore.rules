@@ -35,6 +35,12 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isVerifiedOwner(uid);
       // Profile writes and future collections need their own schema before enabling.
+      match /maintenanceLogs/{maintenanceId} {
+        allow read: if isVerifiedOwner(uid);
+        // Scheduled maintenance is read-only in the app. No client writes until
+        // service logging/schedule editing and their schema validation are implemented.
+        allow write: if false;
+      }
       match /bikes/{bikeId} {
         allow read: if isVerifiedOwner(uid);
         allow create: if isVerifiedOwner(uid) && validBike(bikeId)

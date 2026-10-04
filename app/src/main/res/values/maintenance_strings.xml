@@ -1,0 +1,34 @@
+<resources>
+    <string name="maintenance_title">Maintenance</string>
+    <string name="maintenance_back">Back</string>
+    <string name="maintenance_subtitle">Keep your bike ready for every ride.</string>
+    <string name="maintenance_log_service">Log Service</string>
+    <string name="maintenance_reminder">Reminder</string>
+    <string name="maintenance_overdue">Overdue</string>
+    <string name="maintenance_due_soon">Due Soon</string>
+    <string name="maintenance_up_to_date">Up to Date</string>
+    <string name="maintenance_items">Maintenance Items</string>
+    <string name="maintenance_due_date">Due date</string>
+    <string name="maintenance_due_odometer">Due odometer</string>
+    <string name="maintenance_current_odometer">Current odometer</string>
+    <string name="maintenance_km">%1$s km</string>
+    <string name="maintenance_days_remaining">Days remaining: %1$s</string>
+    <string name="maintenance_days_overdue">Days overdue: %1$s</string>
+    <string name="maintenance_due_today">Due today</string>
+    <string name="maintenance_km_remaining">%1$s km remaining</string>
+    <string name="maintenance_km_overdue">%1$s km overdue</string>
+    <string name="maintenance_due_now">Due at the current odometer</string>
+    <string name="maintenance_progress">Proximity to due threshold</string>
+    <string name="maintenance_progress_help">Fills over the last %1$s days or %2$s km. Full when either threshold is reached.</string>
+    <string name="maintenance_bike_placeholder">Motorcycle image placeholder</string>
+    <string name="maintenance_loading">Loading maintenance…</string>
+    <string name="maintenance_no_bike">No active bike</string>
+    <string name="maintenance_no_bike_body">Add an active motorcycle in Garage to see its maintenance.</string>
+    <string name="maintenance_empty">No maintenance scheduled</string>
+    <string name="maintenance_empty_body">Maintenance tasks will appear here when a schedule is available. Service logging and reminder setup are coming soon.</string>
+    <string name="maintenance_data_error">Some maintenance or bike details could not be loaded. Please contact support.</string>
+    <string name="maintenance_read_error">We could not load maintenance. Please try again.</string>
+    <string name="maintenance_logging_unavailable">Service logging is not available yet.</string>
+    <string name="maintenance_reminder_unavailable">Reminder setup is not available yet.</string>
+    <string name="maintenance_details_unavailable">Maintenance details are not available yet. Due information is shown in the maintenance list.</string>
+</resources>

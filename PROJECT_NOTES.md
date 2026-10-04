@@ -48,7 +48,7 @@ English/Bangla language splitting is disabled.
 
 Garage lives in features/garage with domain/model/Bike, data/repository, ui/screen, and ui/viewmodel packages. GarageViewModel exposes immutable StateFlow state and retained SharedFlow navigation effects. GarageRoute collects state with lifecycle awareness. GarageScreen is stateless and supports loading, empty, bike list, retryable error, and Add bike states in English/Bangla using existing light/dark theme tokens.
 
-Navigation: Splash waits for Firebase Auth, then selects Login/Register, Verify Email, or Home. Verified sessions enter a Scaffold with Home, Care, Garage, and More. AppNavHost owns a typed nested graph, reusing BikesRoute for Garage, MaintenanceRoute for Care, ProfileRoute for More, and AddBikeRoute. Tab state is saved/restored; Add Bike hides the bottom bar and returns to Garage on Back. The enclosing session guard remains active on Add Bike. Home/Care are placeholders; More provides logout. AddBikeScreen is a placeholder only, without a form or writes.
+Navigation: Splash waits for Firebase Auth, then selects Login/Register, Verify Email, or Home. Verified sessions enter a Scaffold with Home, Care, Garage, and More. AppNavHost owns a typed nested graph, reusing BikesRoute for Garage, MaintenanceRoute for Care, ProfileRoute for More, and AddBikeRoute. Tab state is saved/restored; Add Bike hides the bottom bar and returns to Garage on Back. The enclosing session guard remains active on Add Bike. Home is a placeholder; Care now implements Maintenance (see below); More provides logout. AddBikeScreen is a placeholder only, without a form or writes.
 
 Firestore data model:
 - users/{uid}
@@ -67,11 +67,25 @@ FirebaseBikeRepository implements addBike, observeUserBikes, updateBike, and del
 
 Writes use Firestore transactions and require a network connection, avoiding durable offline write queues until sync is designed. Transaction retries use Firestore SDK behavior, with UID rechecked in each attempt. Concurrent edits use the latest successfully committed mutable values; initial odometer and creation timestamp stay immutable. References are captured under the initiating UID and never redirected to another account. There is no Room cache or custom sync queue yet. Firestore's existing SDK read cache is not used as the authoritative initial list.
 
-Root firestore.rules uses rules version 2, requires request.auth.uid == uid and email_verified == true, and validates bike fields, types, bounds, document ID, and server timestamps. It replaces the previous recursive write grant so validation cannot be bypassed. User profile reads require ownership; profile writes, fuel logs, maintenance logs, expenses, reminders, analytics, and unmatched paths are denied until their schemas/features are implemented. Subcollections can exist without a parent user document. Authentication does not create profile documents.
+Root firestore.rules uses rules version 2, requires request.auth.uid == uid and email_verified == true, and validates bike fields, types, bounds, document ID, and server timestamps. It replaces the previous recursive write grant so validation cannot be bypassed. User profile and maintenance reads require verified ownership; maintenance writes, profile writes, fuel logs, expenses, reminders, analytics, and unmatched paths are denied until their schemas/features are implemented. Subcollections can exist without a parent user document. Authentication does not create profile documents.
 
 Publish firestore.rules manually in Firebase Console; adding the file does not deploy it. Before deployment, check the Rules Playground or emulator: verified owner CRUD allowed; another UID, anonymous and unverified users denied; malformed bikes, timestamp tampering, initial-odometer changes, unknown fields, and paths outside bikes denied. Server timestamp writes must be exercised through an SDK. Live Firebase/rules checks require the configured project and are separate from the Android build.
 
 The planned analytics subcollection stores per-bike business aggregates, distinct from Firebase Analytics telemetry. Cloud Functions is reserved for future scaling. No fuel, maintenance, expense, reminder, aggregate, or profile writes are implemented.
+
+## Maintenance
+
+Care now opens MaintenanceScreen through the existing typed MaintenanceRoute inside the authenticated Home shell. Includes summary counts, priority card, keyed list, loading/no-bike/empty/error states, English/Bangla strings, theme tokens, and light/dark/compact large-font previews. No shared bike selection exists: the newest active bike from Garage is used without a switcher; the no-bike action opens Garage.
+
+Reuses Garage's model/repository/contracts/route/ViewModel packages, Hilt, StateFlow, retained SharedFlow effects, and lifecycle collection. AuthRepository supplies identity; Home guards the session. flatMapLatest cancels observation on bike changes and recalculates for odometer updates. Local date refreshes on resume and every minute. Pure status helpers sit beside the ViewModel, following AuthValidation; 16 focused JUnit tests cover thresholds, boundaries, remaining values, priority, and progress.
+
+Read-only records use users/{uid}/maintenanceLogs/{maintenanceId}, filtered by bikeId with a single-field equality query. Required fields: id matching the document ID, bikeId, name (1–100 characters), dueDate (ISO yyyy-MM-dd, years 1900–9999), dueOdometerKm (integer 0–10,000,000), createdAt and updatedAt (Firestore timestamps; epoch milliseconds in the domain). These are scheduled tasks, not completed service history. No status or previous-service baseline is stored. Trusted backend/Console data must supply this schema; the app does not create records. Rules require verified ownership for reads and deny client writes. Publish rules separately before use.
+
+OVERDUE: today >= dueDate OR odometer >= dueOdometerKm. Otherwise DUE_SOON: remaining days <= 30 OR remaining km <= 1,000; otherwise UP_TO_DATE. Priority sorts by status, then the smallest remainingDays/30 or remainingKm/1000 ratio, then date/odometer/ID. Remaining values retain signs. Progress measures proximity within the warning windows (0–100%), not completion of a service interval.
+
+Reads match Garage: server-first initialization, 15-second timeout, retryable localized errors, retained displayed data after network/read failures, and clearing on authentication/permission failure. Cached-only startup is not treated as an authoritative empty list. No Room or offline writes were added.
+
+AppNavHost handles Back/Garage and receives explicit Log Service/Reminder/item callbacks with bike/task IDs. Missing destinations currently show localized unavailable messages; bottom navigation is unchanged. Service logging, schedule editing, service history, reminder scheduling, item details, shared bike selection, and image loading remain deferred. The priority card uses a motorcycle placeholder. Live Firebase/rules and device layout checks remain separate from Android build verification.
 
 ## Future persistence
 

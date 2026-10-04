@@ -1,0 +1,34 @@
+<resources>
+    <string name="maintenance_title">রক্ষণাবেক্ষণ</string>
+    <string name="maintenance_back">ফিরে যান</string>
+    <string name="maintenance_subtitle">প্রতিটি যাত্রার জন্য বাইক প্রস্তুত রাখুন।</string>
+    <string name="maintenance_log_service">সার্ভিস লিখুন</string>
+    <string name="maintenance_reminder">রিমাইন্ডার</string>
+    <string name="maintenance_overdue">সময় পেরিয়েছে</string>
+    <string name="maintenance_due_soon">শীঘ্রই প্রয়োজন</string>
+    <string name="maintenance_up_to_date">হালনাগাদ</string>
+    <string name="maintenance_items">রক্ষণাবেক্ষণের তালিকা</string>
+    <string name="maintenance_due_date">নির্ধারিত তারিখ</string>
+    <string name="maintenance_due_odometer">নির্ধারিত ওডোমিটার</string>
+    <string name="maintenance_current_odometer">বর্তমান ওডোমিটার</string>
+    <string name="maintenance_km">%1$s কিমি</string>
+    <string name="maintenance_days_remaining">বাকি দিন: %1$s</string>
+    <string name="maintenance_days_overdue">পেরিয়ে যাওয়া দিন: %1$s</string>
+    <string name="maintenance_due_today">আজই প্রয়োজন</string>
+    <string name="maintenance_km_remaining">আর %1$s কিমি বাকি</string>
+    <string name="maintenance_km_overdue">%1$s কিমি পেরিয়েছে</string>
+    <string name="maintenance_due_now">বর্তমান ওডোমিটারেই প্রয়োজন</string>
+    <string name="maintenance_progress">নির্ধারিত সীমার নিকটবর্তী</string>
+    <string name="maintenance_progress_help">শেষ %1$s দিন বা %2$s কিমিতে পূর্ণ হয়। যেকোনো একটি সীমায় পৌঁছালে সম্পূর্ণ পূর্ণ।</string>
+    <string name="maintenance_bike_placeholder">মোটরসাইকেলের প্রতীকী ছবি</string>
+    <string name="maintenance_loading">রক্ষণাবেক্ষণ লোড হচ্ছে…</string>
+    <string name="maintenance_no_bike">কোনো সক্রিয় বাইক নেই</string>
+    <string name="maintenance_no_bike_body">রক্ষণাবেক্ষণ দেখতে গ্যারেজে একটি সক্রিয় মোটরসাইকেল যোগ করুন।</string>
+    <string name="maintenance_empty">রক্ষণাবেক্ষণের সময়সূচি নেই</string>
+    <string name="maintenance_empty_body">সময়সূচি তৈরি হলে রক্ষণাবেক্ষণের কাজ এখানে দেখা যাবে। সার্ভিস লেখা ও রিমাইন্ডার সেটআপ শীঘ্রই আসছে।</string>
+    <string name="maintenance_data_error">রক্ষণাবেক্ষণ বা বাইকের কিছু তথ্য লোড করা যায়নি। সহায়তার জন্য যোগাযোগ করুন।</string>
+    <string name="maintenance_read_error">রক্ষণাবেক্ষণ লোড করা যায়নি। আবার চেষ্টা করুন।</string>
+    <string name="maintenance_logging_unavailable">সার্ভিস লেখার সুবিধা এখনো চালু হয়নি।</string>
+    <string name="maintenance_reminder_unavailable">রিমাইন্ডার সেটআপ এখনো চালু হয়নি।</string>
+    <string name="maintenance_details_unavailable">রক্ষণাবেক্ষণের বিস্তারিত পাতা এখনো চালু হয়নি। নির্ধারিত সময় ও দূরত্ব তালিকায় দেখুন।</string>
+</resources>

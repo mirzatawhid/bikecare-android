@@ -27,8 +27,12 @@ import javax.inject.Inject
 class GarageViewModel @Inject constructor(
     private val repository: BikeRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(GarageUiState())
+    private val _uiState = MutableStateFlow<GarageUiState>(GarageUiState.Loading)
     val uiState = _uiState.asStateFlow()
+
+    // The sheet is independent of list loading; null means it is closed.
+    private val _addBikeForm = MutableStateFlow<AddBikeFormState?>(null)
+    val addBikeForm = _addBikeForm.asStateFlow()
 
     // Kept as part of the route contract for future one-off garage effects.
     private val _sideEffect = MutableSharedFlow<GarageSideEffect>()
@@ -56,37 +60,32 @@ class GarageViewModel @Inject constructor(
     }
 
     private fun showAddBikeSheet() {
-        _uiState.value = _uiState.value.copy(
-            isAddBikeSheetVisible = true,
-            addBikeForm = AddBikeFormState(),
-        )
+        if (_addBikeForm.value == null) _addBikeForm.value = AddBikeFormState()
     }
 
     private fun dismissAddBikeSheet() {
-        if (!_uiState.value.addBikeForm.isSaving) {
-            _uiState.value = _uiState.value.copy(isAddBikeSheetVisible = false)
+        if (_addBikeForm.value?.isSaving != true) {
+            _addBikeForm.value = null
         }
     }
 
     private fun updateForm(update: AddBikeFormState.() -> AddBikeFormState) {
-        val state = _uiState.value
-        if (!state.addBikeForm.isSaving) {
-            _uiState.value = state.copy(
-                addBikeForm = state.addBikeForm.update().copy(
-                    errors = AddBikeFormErrors(),
-                    submissionError = null,
-                ),
+        val form = _addBikeForm.value ?: return
+        if (!form.isSaving) {
+            _addBikeForm.value = form.update().copy(
+                errors = AddBikeFormErrors(),
+                submissionError = null,
             )
         }
     }
 
     private fun saveBike() {
-        val form = _uiState.value.addBikeForm
+        val form = _addBikeForm.value ?: return
         if (form.isSaving) return
 
         val validation = form.validate()
         if (validation.errors != AddBikeFormErrors()) {
-            _uiState.value = _uiState.value.copy(addBikeForm = form.copy(errors = validation.errors))
+            _addBikeForm.value = form.copy(errors = validation.errors)
             return
         }
 
@@ -101,23 +100,18 @@ class GarageViewModel @Inject constructor(
             initialOdometer = form.odometer.toLong(),
             currentOdometer = form.odometer.toLong(),
         )
-        _uiState.value = _uiState.value.copy(addBikeForm = form.copy(isSaving = true, submissionError = null))
+        _addBikeForm.value = form.copy(isSaving = true, submissionError = null)
         viewModelScope.launch {
             try {
                 repository.addBike(bike)
-                _uiState.value = _uiState.value.copy(
-                    isAddBikeSheetVisible = false,
-                    addBikeForm = AddBikeFormState(),
-                )
+                _addBikeForm.value = null
                 _sideEffect.emit(GarageSideEffect.BikeAdded)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    addBikeForm = form.copy(
-                        isSaving = false,
-                        submissionError = error.toAddBikeError(),
-                    ),
+                _addBikeForm.value = form.copy(
+                    isSaving = false,
+                    submissionError = error.toAddBikeError(),
                 )
             }
         }
@@ -155,16 +149,16 @@ class GarageViewModel @Inject constructor(
 
     private fun loadBikes() {
         if (loadJob?.isActive == true) return
-        _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        _uiState.value = GarageUiState.Loading
         loadJob = viewModelScope.launch {
             try {
                 repository.observeUserBikes().collect { bikes ->
-                    _uiState.value = _uiState.value.copy(bikes = bikes, isLoading = false, error = null)
+                    _uiState.value = if (bikes.isEmpty()) GarageUiState.Empty else GarageUiState.Content(bikes)
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = when ((error as? BikeException)?.failure) {
+                _uiState.value = GarageUiState.Error(message = when ((error as? BikeException)?.failure) {
                     BikeFailure.Network -> R.string.garage_network_error
                     BikeFailure.PermissionDenied -> R.string.garage_permission_error
                     BikeFailure.AuthenticationExpired -> R.string.garage_auth_error

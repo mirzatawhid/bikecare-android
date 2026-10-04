@@ -17,6 +17,7 @@ import studio.appvero.bikecare.features.garage.ui.viewmodel.GarageViewModel
 @Composable
 fun GarageRoute(viewModel: GarageViewModel = hiltViewModel()) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
+    val addBikeForm = viewModel.addBikeForm.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val bikeAddedMessage = localizedString(R.string.garage_bike_saved)
 
@@ -29,7 +30,7 @@ fun GarageRoute(viewModel: GarageViewModel = hiltViewModel()) {
     }
 
     Box(Modifier.fillMaxSize()) {
-        GarageScreen(state.value, viewModel::onEvent)
+        GarageScreen(state.value, addBikeForm.value, viewModel::onEvent)
         SnackbarHost(hostState = snackbarHostState)
     }
 }

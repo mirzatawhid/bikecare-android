@@ -4,6 +4,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import studio.appvero.bikecare.features.garage.data.repository.BikeRepository
 import studio.appvero.bikecare.features.garage.data.repository.FirebaseBikeRepository
+import studio.appvero.bikecare.features.maintenance.data.repository.MaintenanceRepository
+import studio.appvero.bikecare.features.maintenance.data.repository.FirebaseMaintenanceRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -23,6 +25,10 @@ abstract class FirebaseModule {
     @Binds
     @Singleton
     abstract fun bindBikeRepository(repository: FirebaseBikeRepository): BikeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMaintenanceRepository(repository: FirebaseMaintenanceRepository): MaintenanceRepository
 
     companion object {
         @Provides

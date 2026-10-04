@@ -45,7 +45,7 @@ import studio.appvero.bikecare.ui.theme.AppSpacing
 import studio.appvero.bikecare.ui.theme.AppTheme
 
 @Composable
-fun GarageScreen(state: GarageUiState, onEvent: (GarageEvent) -> Unit) {
+fun GarageScreen(state: GarageUiState, addBikeForm: AddBikeFormState?, onEvent: (GarageEvent) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(AppDimensions.screenHorizontalPadding),
@@ -56,8 +56,8 @@ fun GarageScreen(state: GarageUiState, onEvent: (GarageEvent) -> Unit) {
             Spacer(Modifier.height(AppSpacing.xs))
             Text(localizedString(R.string.garage_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        when {
-            state.isLoading -> item {
+        when (state) {
+            GarageUiState.Loading -> item {
                 Column(
                     Modifier.fillMaxWidth().padding(AppSpacing.xl),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,29 +67,29 @@ fun GarageScreen(state: GarageUiState, onEvent: (GarageEvent) -> Unit) {
                     Text(localizedString(R.string.garage_loading))
                 }
             }
-            state.error != null -> item {
-                GarageMessage(localizedString(state.error), isError = true) {
+            is GarageUiState.Error -> item {
+                GarageMessage(localizedString(state.message), isError = true) {
                     BikeCarePrimaryButton(
                         text = localizedString(R.string.garage_retry),
                         onClick = { onEvent(GarageEvent.Retry) },
                     )
                 }
             }
-            state.bikes.isEmpty() -> item {
+            GarageUiState.Empty -> item {
                 GarageMessage(localizedString(R.string.garage_empty)) {
                     Text(localizedString(R.string.garage_empty_body), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     AddBikeButton { onEvent(GarageEvent.OpenAddBikeSheet) }
                 }
             }
-            else -> {
+            is GarageUiState.Content -> {
                 item { AddBikeButton { onEvent(GarageEvent.OpenAddBikeSheet) } }
                 items(state.bikes, key = { it.id }) { BikeCard(it) }
             }
         }
     }
 
-    if (state.isAddBikeSheetVisible) {
-        AddBikeSheet(form = state.addBikeForm, onEvent = onEvent)
+    if (addBikeForm != null) {
+        AddBikeSheet(form = addBikeForm, onEvent = onEvent)
     }
 }
 
