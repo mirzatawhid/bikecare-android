@@ -11,19 +11,15 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import studio.appvero.bikecare.features.auth.data.repository.AuthRepository
 import studio.appvero.bikecare.features.garage.domain.model.Bike
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 class FirebaseBikeRepository @Inject constructor(
@@ -48,11 +44,6 @@ class FirebaseBikeRepository @Inject constructor(
                 emit(emptyList())
                 throw BikeException(BikeFailure.AuthenticationExpired)
             } else callbackFlow {
-                // Do not report an empty local cache as a confirmed empty Garage.
-                val initialTimeout = launch {
-                    delay(15_000.milliseconds)
-                    close(BikeException(BikeFailure.Network))
-                }
                 val registration = bikes(user.uid).orderBy("createdAt", Query.Direction.DESCENDING)
                     .addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, error ->
                         if (auth.currentUser?.uid != user.uid) {
@@ -60,8 +51,7 @@ class FirebaseBikeRepository @Inject constructor(
                             close(BikeException(BikeFailure.AuthenticationExpired))
                         } else if (error != null) {
                             close(mapError(error))
-                        } else if (snapshot != null && !snapshot.metadata.isFromCache) {
-                            initialTimeout.cancel()
+                        } else if (snapshot != null) {
                             try {
                                 trySend(snapshot.documents.map { it.toBike() })
                             } catch (error: Exception) {
@@ -69,7 +59,7 @@ class FirebaseBikeRepository @Inject constructor(
                             }
                         }
                     }
-                awaitClose { initialTimeout.cancel(); registration.remove() }
+                awaitClose { registration.remove() }
             }
         }
 
@@ -80,47 +70,34 @@ class FirebaseBikeRepository @Inject constructor(
         validate(bike)
         val uid = requireUid()
         val reference = bikes(uid).document(bike.id)
-        // Transactions fail offline instead of leaving writes queued for a later account.
-        firestore.runTransaction { transaction ->
-            if (requireUid() != uid) throw BikeException(BikeFailure.AuthenticationExpired)
-            val existing = transaction.get(reference)
-            if (creating && existing.exists()) throw BikeException(BikeFailure.AlreadyExists)
-            if (!creating && !existing.exists()) throw BikeException(BikeFailure.NotFound)
-            val fields = mutableMapOf<String, Any?>(
-                "id" to bike.id,
-                "brand" to bike.brand.trim(),
-                "model" to bike.model.trim(),
-                "year" to bike.year,
-                "registrationNumber" to bike.registrationNumber.trim(),
-                "initialOdometer" to bike.initialOdometer,
-                "currentOdometer" to bike.currentOdometer,
-                "imageUrl" to bike.imageUrl,
-                "isActive" to bike.isActive,
-                "updatedAt" to FieldValue.serverTimestamp(),
-            )
-            if (creating) {
-                fields["createdAt"] = FieldValue.serverTimestamp()
-                transaction.set(reference, fields)
-            } else {
-                if (existing.getLong("initialOdometer") != bike.initialOdometer) {
-                    throw BikeException(BikeFailure.InvalidData)
-                }
-                transaction.update(reference, fields)
-            }
-            Unit
-        }.await()
+        if (requireUid() != uid) throw BikeException(BikeFailure.AuthenticationExpired)
+        val fields = mutableMapOf(
+            "id" to bike.id,
+            "brand" to bike.brand.trim(),
+            "model" to bike.model.trim(),
+            "year" to bike.year,
+            "registrationNumber" to bike.registrationNumber.trim(),
+            "initialOdometer" to bike.initialOdometer,
+            "currentOdometer" to bike.currentOdometer,
+            "imageUrl" to bike.imageUrl,
+            "isActive" to bike.isActive,
+            "updatedAt" to FieldValue.serverTimestamp(),
+        )
+        if (creating) {
+            fields["createdAt"] = FieldValue.serverTimestamp()
+            reference.set(fields)
+        } else {
+            fields.remove("initialOdometer")
+            reference.update(fields)
+        }
     }
 
     override suspend fun deleteBike(id: String): Unit = mapped {
         validateId(id)
         val uid = requireUid()
         val reference = bikes(uid).document(id)
-        firestore.runTransaction { transaction ->
-            if (requireUid() != uid) throw BikeException(BikeFailure.AuthenticationExpired)
-            transaction.get(reference)
-            transaction.delete(reference)
-            Unit
-        }.await()
+        if (requireUid() != uid) throw BikeException(BikeFailure.AuthenticationExpired)
+        reference.delete()
     }
 
     private fun validateId(id: String) {

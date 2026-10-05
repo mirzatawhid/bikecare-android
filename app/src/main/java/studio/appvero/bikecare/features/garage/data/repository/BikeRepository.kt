@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import studio.appvero.bikecare.features.garage.domain.model.Bike
 
 interface BikeRepository {
-    /** Caller supplies a stable, nonempty ID. Writes require a server connection. */
+    /** Caller supplies a stable, nonempty ID. Writes are queued locally and may sync when online. */
     suspend fun addBike(bike: Bike)
     fun observeUserBikes(): Flow<List<Bike>>
     suspend fun updateBike(bike: Bike)

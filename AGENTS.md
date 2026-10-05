@@ -4,9 +4,9 @@ Inspect only files relevant to the task. Treat source as truth. Read `PROJECT_NO
 
 ## Stack
 
-Single Android `app` module using Kotlin, Compose Material 3, MVVM, Hilt, typed Navigation Compose, Firebase Authentication/Firestore/Storage/Analytics, and DataStore for English/Bangla preferences. Room is the planned local cache for future business persistence; Crashlytics is deferred until configured.
+Single Android `app` module using Kotlin, Compose Material 3, MVVM, Hilt, typed Navigation Compose, Firebase Authentication/Firestore/Storage/Analytics, and DataStore for English/Bangla preferences. Use Firestore's built-in persistent cache and offline write queue for MVP business data. Room-based persistence/sync is deferred; Crashlytics is deferred until configured.
 
-Email/password auth, required email verification, logout, and hosted password recovery exist. Home is temporary. Bike/service/reminder persistence and sync are not implemented. Google sign-in is deferred.
+Email/password auth, required email verification, logout, and hosted password recovery exist. Home is temporary. Bike persistence uses Firestore's MVP offline cache and queued writes; service/reminder persistence is not implemented. Google sign-in is deferred.
 
 Do not add dependencies unless requested.
 
@@ -44,13 +44,11 @@ Use a `domain` package only for models when needed. Do not introduce UseCase/Int
 
 Firebase Authentication is the source of user identity and session persistence. Use the authenticated Firebase UID, never a saved user ID or boolean preference, as identity.
 
-Firestore is the primary cloud database. All user data must be scoped under the authenticated UID. Firestore security rules are mandatory for every user-owned resource; require ownership and verified email. Storage objects also require UID ownership rules.
+Firestore is the primary cloud database and MVP offline-first store. Use its built-in persistent cache, snapshot listeners, and queued writes; do not add a Room cache or custom sync queue for MVP business data. All user data must be scoped under the authenticated UID. Firestore security rules are mandatory for every user-owned resource; require ownership and verified email. Storage objects also require UID ownership rules.
 
 Keep repository interfaces and implementations in the existing data/repository folders. ViewModels depend directly on repository interfaces so future backend migration remains possible. Never access Firebase from Compose UI or ViewModels. All SDK operations and exception mapping belong in repository implementations; Firebase models must not leak into domain models.
 
-Prefer offline-first business persistence using Room where needed:
-Repository -> Room -> Sync queue -> Firestore.
-Do not create unused caches or sync infrastructure. Define retries, conflicts, and account-switch isolation when implementing business persistence.
+DataStore remains for app preferences such as language only; do not use it for business records or identity. Firestore writes may remain pending and later be rejected by security rules, so do not treat local enqueue as confirmed server persistence. Preserve UID-scoped document references and account-switch isolation. Defer Room and a custom sync queue until explicitly planned later.
 
 Never store passwords or auth tokens in DataStore/SavedStateHandle. Firebase owns authentication persistence. Password reset uses a hosted email link and never signs in the app. Require verification before Home, refresh user/token after verification, and clear protected navigation on logout/session loss.
 
