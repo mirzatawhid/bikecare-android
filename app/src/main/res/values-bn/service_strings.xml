@@ -1,0 +1,35 @@
+<resources>
+    <string name="service_title">সার্ভিস যোগ করুন</string>
+    <string name="service_subtitle">%1$s · বাইকের যত্নের কাজগুলোর রেকর্ড রাখুন।</string>
+    <string name="service_choose">রক্ষণাবেক্ষণের কাজ বেছে নিন</string>
+    <string name="service_other">অন্য সার্ভিস</string>
+    <string name="service_name">সার্ভিসের নাম</string>
+    <string name="service_date">সার্ভিসের তারিখ</string>
+    <string name="service_odometer">ওডোমিটার (কিমি)</string>
+    <string name="service_cost">মোট খরচ (৳)</string>
+    <string name="service_workshop">ওয়ার্কশপ (ঐচ্ছিক)</string>
+    <string name="service_notes">নোট (ঐচ্ছিক)</string>
+    <string name="service_set_reminder">রিমাইন্ডার সেট করুন</string>
+    <string name="service_due_km">নির্ধারিত দূরত্ব (কিমি)</string>
+    <string name="service_due_date">নির্ধারিত তারিখ</string>
+    <string name="service_repeat_km">পুনরাবৃত্তি (কিমি)</string>
+    <string name="service_repeat_days">পুনরাবৃত্তি (দিন)</string>
+    <string name="service_due_section">নির্ধারিত সময়</string>
+    <string name="service_due_help">নির্ধারিত দূরত্ব, তারিখ অথবা দুটোই দিন। যেকোনো একটি সীমায় পৌঁছালেই রিমাইন্ডার আসবে।</string>
+    <string name="service_repeat_section">প্রতি কত কিমি বা দিনে</string>
+    <string name="service_repeat_help">ঐচ্ছিক ব্যবধান এই সার্ভিস থেকে পরবর্তী নির্ধারিত সময় হিসাব করে। একই সার্ভিস আবার যোগ করলে ব্যবধানটি থাকবে—যেমন ইঞ্জিন অয়েল পরিবর্তনের নিয়মিত রিমাইন্ডার।</string>
+    <string name="service_save">সার্ভিস সংরক্ষণ করুন</string>
+    <string name="service_date_confirm">তারিখ দিন</string>
+    <string name="service_date_cancel">বাতিল</string>
+    <string name="service_date_clear">মুছুন</string>
+    <string name="service_name_error">সার্ভিসের নাম দিন (১–১০০ অক্ষর)।</string>
+    <string name="service_date_error">সঠিক তারিখ বেছে নিন (১৯০০–৯৯৯৯)।</string>
+    <string name="service_invalid_number">০ থেকে ১,০০,০০,০০০-এর মধ্যে পূর্ণসংখ্যা দিন। পুনরাবৃত্তির ব্যবধান শূন্যের বেশি হতে হবে।</string>
+    <string name="service_cost_error">সর্বোচ্চ দুই দশমিক ঘরসহ ০ থেকে ৳১,০০,০০,০০,০০০-এর মধ্যে খরচ দিন।</string>
+    <string name="service_text_error">ওয়ার্কশপে সর্বোচ্চ ২০০ এবং নোটে ২,০০০ অক্ষর লিখুন।</string>
+    <string name="service_due_km_error">০ থেকে ১,০০,০০,০০০ কিমির মধ্যে পূর্ণসংখ্যা দিন।</string>
+    <string name="service_due_date_error">১৯০০ থেকে ৯৯৯৯ সালের মধ্যে সঠিক তারিখ বেছে নিন।</string>
+    <string name="service_due_required">অন্তত একটি নির্ধারিত দূরত্ব বা তারিখ দিন, অথবা সংশ্লিষ্ট পুনরাবৃত্তির ব্যবধান দিন।</string>
+    <string name="service_save_invalid">বাইক বা রক্ষণাবেক্ষণের কাজটি বদলে যেতে পারে। তথ্য দেখুন, অথবা বন্ধ করে আবার চেষ্টা করুন।</string>
+    <string name="service_save_error">সার্ভিস সংরক্ষণ করা যায়নি। আপনার তথ্য রাখা আছে। আবার চেষ্টা করুন।</string>
+</resources>

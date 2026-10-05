@@ -11,21 +11,30 @@ internal const val DUE_SOON_DAYS = 30L
 internal const val DUE_SOON_KM = 1_000L
 
 internal fun MaintenanceItem.assess(today: LocalDate, currentOdometerKm: Long): MaintenanceAssessment {
-    val days = ChronoUnit.DAYS.between(today, dueDate)
-    val km = dueOdometerKm - currentOdometerKm
+    val days = dueDate?.let { ChronoUnit.DAYS.between(today, it) }
+    val km = dueOdometerKm?.minus(currentOdometerKm)
+    val thresholds = buildList {
+        days?.let { add(it to DUE_SOON_DAYS) }
+        km?.let { add(it to DUE_SOON_KM) }
+    }
     val status = when {
-        days <= 0 || km <= 0 -> MaintenanceStatus.OVERDUE
-        days <= DUE_SOON_DAYS || km <= DUE_SOON_KM -> MaintenanceStatus.DUE_SOON
+        thresholds.any { (remaining, _) -> remaining <= 0 } -> MaintenanceStatus.OVERDUE
+        thresholds.any { (remaining, warningWindow) -> remaining <= warningWindow } -> MaintenanceStatus.DUE_SOON
         else -> MaintenanceStatus.UP_TO_DATE
     }
-    val proximity = minOf(days.toDouble() / DUE_SOON_DAYS, km.toDouble() / DUE_SOON_KM)
+    val proximity = thresholds.minOfOrNull { (remaining, warningWindow) -> remaining.toDouble() / warningWindow } ?: 1.0
     return MaintenanceAssessment(this, status, days, km, (1.0 - proximity).coerceIn(0.0, 1.0).toFloat())
 }
 
 /** Compare date and distance using warning windows; stable ID breaks identical ties. */
 internal fun List<MaintenanceAssessment>.byPriority(): List<MaintenanceAssessment> = sortedWith(
     compareBy<MaintenanceAssessment> { it.status.ordinal }
-        .thenBy { minOf(it.remainingDays.toDouble() / DUE_SOON_DAYS, it.remainingKm.toDouble() / DUE_SOON_KM) }
+        .thenBy { assessment ->
+            listOfNotNull(
+                assessment.remainingDays?.toDouble()?.div(DUE_SOON_DAYS),
+                assessment.remainingKm?.toDouble()?.div(DUE_SOON_KM),
+            ).minOrNull() ?: 1.0
+        }
         .thenBy { it.item.dueDate }
         .thenBy { it.item.dueOdometerKm }
         .thenBy { it.item.id },

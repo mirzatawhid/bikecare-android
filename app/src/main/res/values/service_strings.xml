@@ -1,0 +1,35 @@
+<resources>
+    <string name="service_title">Log a service</string>
+    <string name="service_subtitle">%1$s · Keep a record of the work you’ve done.</string>
+    <string name="service_choose">Choose a maintenance item</string>
+    <string name="service_other">Other service</string>
+    <string name="service_name">Service name</string>
+    <string name="service_date">Service date</string>
+    <string name="service_odometer">Odometer (km)</string>
+    <string name="service_cost">Total cost (৳)</string>
+    <string name="service_workshop">Workshop (optional)</string>
+    <string name="service_notes">Notes (optional)</string>
+    <string name="service_set_reminder">Set reminder</string>
+    <string name="service_due_km">Due at (km)</string>
+    <string name="service_due_date">Due date</string>
+    <string name="service_repeat_km">Repeat every (km)</string>
+    <string name="service_repeat_days">Repeat every (days)</string>
+    <string name="service_due_section">Due</string>
+    <string name="service_due_help">Set a due mileage, a due date, or both. The reminder will trigger when either set threshold is reached.</string>
+    <string name="service_repeat_section">Remind every</string>
+    <string name="service_repeat_help">Optional intervals calculate the next due point from this service. They carry forward when you log this service again, so you can set up recurring care such as an engine oil change.</string>
+    <string name="service_save">Save service</string>
+    <string name="service_date_confirm">Set date</string>
+    <string name="service_date_cancel">Cancel</string>
+    <string name="service_date_clear">Clear</string>
+    <string name="service_name_error">Enter a service name (1–100 characters).</string>
+    <string name="service_date_error">Choose a valid date (1900–9999).</string>
+    <string name="service_invalid_number">Enter a whole number from 0 to 10,000,000. Repeat intervals must be greater than zero.</string>
+    <string name="service_cost_error">Enter a non-negative amount up to ৳1,000,000,000, with at most two decimal places.</string>
+    <string name="service_text_error">Use up to 200 characters for workshop and 2,000 for notes.</string>
+    <string name="service_due_km_error">Enter a whole number from 0 to 10,000,000 km.</string>
+    <string name="service_due_date_error">Choose a valid date from 1900 to 9999.</string>
+    <string name="service_due_required">Set at least one due mileage or due date, or enter a matching repeat interval.</string>
+    <string name="service_save_invalid">The bike or maintenance item may have changed. Check the form, or close it and try again.</string>
+    <string name="service_save_error">Could not save the service. Your entries are kept. Please try again.</string>
+</resources>

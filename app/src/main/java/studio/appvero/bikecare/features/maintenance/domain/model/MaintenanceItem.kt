@@ -7,10 +7,13 @@ data class MaintenanceItem(
     val id: String,
     val bikeId: String,
     val name: String,
-    val dueDate: LocalDate,
-    val dueOdometerKm: Long,
+    val dueDate: LocalDate?,
+    val dueOdometerKm: Long?,
     val createdAt: Long,
     val updatedAt: Long,
+    val repeatEveryKm: Long? = null,
+    val repeatEveryDays: Long? = null,
+    val isCompleted: Boolean = false,
 )
 
 enum class MaintenanceStatus { OVERDUE, DUE_SOON, UP_TO_DATE }
@@ -18,8 +21,8 @@ enum class MaintenanceStatus { OVERDUE, DUE_SOON, UP_TO_DATE }
 data class MaintenanceAssessment(
     val item: MaintenanceItem,
     val status: MaintenanceStatus,
-    val remainingDays: Long,
-    val remainingKm: Long,
+    val remainingDays: Long?,
+    val remainingKm: Long?,
     /** 0 at/outside the warning window, 1 when either due threshold is reached. */
     val dueWindowProgress: Float,
 )

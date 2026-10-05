@@ -97,6 +97,10 @@ fun BikeCareTextField(
     keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
     keyboardActions: androidx.compose.foundation.text.KeyboardActions = androidx.compose.foundation.text.KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    readOnly: Boolean = false,
+    trailingIcon: (@Composable () -> Unit)? = null,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.xxs)) {
         Text(
@@ -106,9 +110,12 @@ fun BikeCareTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().semantics { contentDescription = label },
             enabled = enabled,
-            singleLine = true,
+            singleLine = singleLine,
+            minLines = minLines,
+            readOnly = readOnly,
+            trailingIcon = trailingIcon,
             placeholder = placeholder.takeIf { it.isNotBlank() }?.let { { Text(it) } },
             isError = error != null,
             supportingText = error?.let { { Text(it) } },

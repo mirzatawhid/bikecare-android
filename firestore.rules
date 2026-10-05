@@ -34,12 +34,62 @@ service cloud.firestore {
 
     match /users/{uid} {
       allow read: if isVerifiedOwner(uid);
-      // Profile writes and future collections need their own schema before enabling.
+      function validDate(value) {
+        return value is string && value.matches('(19[0-9]{2}|[2-9][0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])');
+      }
+      function validKm(value) {
+        return value is int && value >= 0 && value <= 10000000;
+      }
+      function validRepeat(value) {
+        return value == null || (value is int && value > 0 && value <= 10000000);
+      }
+      function validBikeLink(data) {
+        return data.bikeId is string && data.bikeId.size() > 0 && data.bikeId.size() <= 128
+          && exists(/databases/$(database)/documents/users/$(uid)/bikes/$(data.bikeId));
+      }
+      function validMaintenance(maintenanceId) {
+        let data = request.resource.data;
+        return data.keys().hasAll(['id', 'bikeId', 'name', 'createdAt', 'updatedAt'])
+          && data.keys().hasOnly(['id', 'bikeId', 'name', 'dueDate', 'dueOdometerKm', 'createdAt', 'updatedAt',
+            'repeatEveryKm', 'repeatEveryDays', 'isCompleted'])
+          && data.id == maintenanceId && maintenanceId.size() > 0 && maintenanceId.size() <= 128
+          && validBikeLink(data) && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+          && (data.get('dueDate', null) == null || validDate(data.get('dueDate', null)))
+          && (data.get('dueOdometerKm', null) == null || validKm(data.get('dueOdometerKm', null)))
+          && (data.get('dueDate', null) != null || data.get('dueOdometerKm', null) != null)
+          && validRepeat(data.get('repeatEveryKm', null)) && validRepeat(data.get('repeatEveryDays', null))
+          && data.get('isCompleted', false) is bool
+          && data.createdAt is timestamp && data.updatedAt == request.time && data.updatedAt >= data.createdAt;
+      }
       match /maintenanceLogs/{maintenanceId} {
         allow read: if isVerifiedOwner(uid);
-        // Scheduled maintenance is read-only in the app. No client writes until
-        // service logging/schedule editing and their schema validation are implemented.
-        allow write: if false;
+        allow create: if isVerifiedOwner(uid) && validMaintenance(maintenanceId)
+          && request.resource.data.createdAt == request.time;
+        allow update: if isVerifiedOwner(uid) && validMaintenance(maintenanceId)
+          && request.resource.data.bikeId == resource.data.bikeId
+          && request.resource.data.createdAt == resource.data.createdAt;
+      }
+      match /serviceLogs/{serviceId} {
+        allow read: if isVerifiedOwner(uid);
+        // Completed history is immutable; the client only creates records.
+        allow create: if isVerifiedOwner(uid)
+          && request.resource.data.keys().hasAll(['id', 'bikeId', 'maintenanceId', 'name', 'serviceDate',
+            'odometerKm', 'totalCostPoisha', 'workshop', 'notes', 'createdAt', 'updatedAt'])
+          && request.resource.data.keys().hasOnly(['id', 'bikeId', 'maintenanceId', 'name', 'serviceDate',
+            'odometerKm', 'totalCostPoisha', 'workshop', 'notes', 'createdAt', 'updatedAt'])
+          && request.resource.data.id == serviceId && serviceId.size() > 0 && serviceId.size() <= 128
+          && validBikeLink(request.resource.data)
+          && (request.resource.data.maintenanceId == null ||
+            (request.resource.data.maintenanceId is string && request.resource.data.maintenanceId.size() > 0
+              && request.resource.data.maintenanceId.size() <= 128
+              && getAfter(/databases/$(database)/documents/users/$(uid)/maintenanceLogs/$(request.resource.data.maintenanceId)).data.bikeId == request.resource.data.bikeId))
+          && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100
+          && validDate(request.resource.data.serviceDate) && validKm(request.resource.data.odometerKm)
+          && (request.resource.data.totalCostPoisha == null || (request.resource.data.totalCostPoisha is int
+            && request.resource.data.totalCostPoisha >= 0 && request.resource.data.totalCostPoisha <= 100000000000))
+          && request.resource.data.workshop is string && request.resource.data.workshop.size() <= 200
+          && request.resource.data.notes is string && request.resource.data.notes.size() <= 2000
+          && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time;
       }
       match /bikes/{bikeId} {
         allow read: if isVerifiedOwner(uid);

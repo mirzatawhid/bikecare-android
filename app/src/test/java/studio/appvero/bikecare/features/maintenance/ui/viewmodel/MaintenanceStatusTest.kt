@@ -78,4 +78,23 @@ class MaintenanceStatusTest {
         val task = item(1, 2_000).copy(dueDate = LocalDate.of(2028, 3, 1))
         assertEquals(2L, task.assess(LocalDate.of(2028, 2, 28), odometer).remainingDays)
     }
+
+    @Test fun mileageOnlyAssessmentUsesOnlyMileage() {
+        val assessment = item(100, 500).copy(dueDate = null).assess(today, odometer)
+        assertEquals(DUE_SOON, assessment.status)
+        assertNull(assessment.remainingDays)
+        assertEquals(500L, assessment.remainingKm)
+    }
+
+    @Test fun dateOnlyAssessmentUsesOnlyDate() {
+        val assessment = item(10, 5_000).copy(dueOdometerKm = null).assess(today, odometer)
+        assertEquals(DUE_SOON, assessment.status)
+        assertEquals(10L, assessment.remainingDays)
+        assertNull(assessment.remainingKm)
+    }
+
+    @Test fun configuredThresholdsUseEitherThresholdForStatus() {
+        val assessment = item(-1, 5_000).assess(today, odometer)
+        assertEquals(OVERDUE, assessment.status)
+    }
 }

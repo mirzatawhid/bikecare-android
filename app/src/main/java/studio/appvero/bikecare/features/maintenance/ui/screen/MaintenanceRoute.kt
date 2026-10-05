@@ -15,30 +15,30 @@ import studio.appvero.bikecare.features.maintenance.ui.viewmodel.MaintenanceView
 fun MaintenanceRoute(
     onBack: () -> Unit,
     onOpenGarage: () -> Unit,
-    onLogService: (bikeId: String, maintenanceId: String?) -> Unit,
     onReminder: (bikeId: String) -> Unit,
     onOpenItem: (bikeId: String, maintenanceId: String) -> Unit,
     viewModel: MaintenanceViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val form by viewModel.logServiceForm.collectAsStateWithLifecycle()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(viewModel, lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.onEvent(MaintenanceEvent.RefreshDate)
         }
     }
-    LaunchedEffect(viewModel, lifecycle, onBack, onOpenGarage, onLogService, onReminder, onOpenItem) {
+    LaunchedEffect(viewModel, lifecycle, onBack, onOpenGarage, onReminder, onOpenItem) {
         viewModel.sideEffect.collect { effect ->
             lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
             viewModel.onEvent(MaintenanceEvent.EffectHandled)
             when (effect) {
                 MaintenanceSideEffect.Back -> onBack()
                 MaintenanceSideEffect.OpenGarage -> onOpenGarage()
-                is MaintenanceSideEffect.LogService -> onLogService(effect.bikeId, effect.maintenanceId)
                 is MaintenanceSideEffect.Reminder -> onReminder(effect.bikeId)
                 is MaintenanceSideEffect.OpenItem -> onOpenItem(effect.bikeId, effect.maintenanceId)
             }
         }
     }
     MaintenanceScreen(state, viewModel::onEvent)
+    form?.let { LogServiceSheet(it, viewModel::onEvent) }
 }

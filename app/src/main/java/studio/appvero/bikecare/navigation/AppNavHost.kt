@@ -81,7 +81,6 @@ fun AppNavHost(navController: NavHostController) {
                 val homeController = rememberNavController()
                 val snackbar = remember { SnackbarHostState() }
                 val scope = rememberCoroutineScope()
-                val loggingUnavailable = localizedString(R.string.maintenance_logging_unavailable)
                 val reminderUnavailable = localizedString(R.string.maintenance_reminder_unavailable)
                 val detailsUnavailable = localizedString(R.string.maintenance_details_unavailable)
                 val entry by homeController.currentBackStackEntryAsState()
@@ -120,7 +119,6 @@ fun AppNavHost(navController: NavHostController) {
                                     },
                                     // Callbacks retain target IDs for the future typed destinations.
                                     // Until those screens exist, give honest feedback in the shell.
-                                    onLogService = { _, _ -> scope.launch { snackbar.showSnackbar(loggingUnavailable) } },
                                     onReminder = { _ -> scope.launch { snackbar.showSnackbar(reminderUnavailable) } },
                                     onOpenItem = { _, _ -> scope.launch { snackbar.showSnackbar(detailsUnavailable) } },
                                 )

@@ -17,6 +17,8 @@ import studio.appvero.bikecare.features.maintenance.data.repository.*
 import studio.appvero.bikecare.features.maintenance.domain.model.MaintenanceStatus
 import studio.appvero.bikecare.features.maintenance.ui.screen.*
 import java.time.LocalDate
+import java.util.UUID
+import studio.appvero.bikecare.features.maintenance.ui.screen.ServiceField.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +28,8 @@ class MaintenanceViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<MaintenanceUiState>(MaintenanceUiState.Loading())
     val uiState = _uiState.asStateFlow()
+    private val _logServiceForm = MutableStateFlow<LogServiceFormState?>(null)
+    val logServiceForm = _logServiceForm.asStateFlow()
     private val _sideEffect = MutableSharedFlow<MaintenanceSideEffect>(replay = 1)
     val sideEffect = _sideEffect.asSharedFlow()
     private val today = MutableStateFlow(LocalDate.now())
@@ -46,6 +50,20 @@ class MaintenanceViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     fun onEvent(event: MaintenanceEvent) {
         when (event) {
+            is MaintenanceEvent.LogService -> openService(event.maintenanceId)
+            MaintenanceEvent.DismissLogService -> if (_logServiceForm.value?.isSaving != true) _logServiceForm.value = null
+            is MaintenanceEvent.ServiceFieldChanged -> updateForm {
+                copy(fields = fields + (event.field to event.value))
+            }
+            is MaintenanceEvent.SelectService -> updateForm {
+                val item = services.firstOrNull { it.id == event.maintenanceId }
+                copy(maintenanceId = item?.id, fields = fields + mapOf(
+                    Name to item?.name.orEmpty(), RepeatKm to item?.repeatEveryKm?.toString().orEmpty(),
+                    RepeatDays to item?.repeatEveryDays?.toString().orEmpty(), DueDate to "", DueOdometer to "",
+                ), reminderEnabled = item?.let { it.repeatEveryKm != null || it.repeatEveryDays != null } == true)
+            }
+            is MaintenanceEvent.SetReminder -> updateForm { copy(reminderEnabled = event.enabled) }
+            MaintenanceEvent.SaveService -> saveService()
             MaintenanceEvent.Retry -> load()
             MaintenanceEvent.RefreshDate -> today.value = LocalDate.now()
             MaintenanceEvent.EffectHandled -> {
@@ -58,13 +76,63 @@ class MaintenanceViewModel @Inject constructor(
                 val effect = when (event) {
                     MaintenanceEvent.Back -> MaintenanceSideEffect.Back
                     MaintenanceEvent.OpenGarage -> MaintenanceSideEffect.OpenGarage
-                    is MaintenanceEvent.LogService -> bikeId?.let { MaintenanceSideEffect.LogService(it, event.maintenanceId) }
                     MaintenanceEvent.Reminder -> bikeId?.let { MaintenanceSideEffect.Reminder(it) }
                     is MaintenanceEvent.OpenItem -> bikeId?.let { MaintenanceSideEffect.OpenItem(it, event.maintenanceId) }
                     else -> null
                 } ?: return
                 navigationPending = true
                 viewModelScope.launch { _sideEffect.emit(effect) }
+            }
+        }
+    }
+
+    private fun openService(maintenanceId: String?) {
+        if (_logServiceForm.value != null) return
+        val bike = _uiState.value.bike ?: return
+        val items = _uiState.value.retainedContent()?.items.orEmpty().map { it.item }
+        val item = items.firstOrNull { it.id == maintenanceId }
+        if (maintenanceId != null && item == null) return
+        _logServiceForm.value = LogServiceFormState(
+            id = UUID.randomUUID().toString(), bike = bike, maintenanceId = item?.id, services = items,
+            reminderEnabled = item?.let { it.repeatEveryKm != null || it.repeatEveryDays != null } == true,
+            fields = mapOf(Name to item?.name.orEmpty(), ServiceDate to LocalDate.now().toString(),
+                Odometer to bike.currentOdometer.toString(), RepeatKm to item?.repeatEveryKm?.toString().orEmpty(),
+                RepeatDays to item?.repeatEveryDays?.toString().orEmpty()),
+        )
+    }
+
+    private fun updateForm(update: LogServiceFormState.() -> LogServiceFormState) {
+        val form = _logServiceForm.value ?: return
+        if (!form.isSaving) _logServiceForm.value = form.update().copy(errors = emptyMap(), submissionError = null)
+    }
+
+    private fun saveService() {
+        val form = _logServiceForm.value ?: return
+        if (form.isSaving) return
+        val validation = form.validateService()
+        val log = validation.log
+        if (log == null) {
+            _logServiceForm.value = form.copy(errors = validation.errors)
+            return
+        }
+        _logServiceForm.value = form.copy(isSaving = true, errors = emptyMap(), submissionError = null)
+        viewModelScope.launch {
+            try {
+                repository.logService(log)
+                if (_logServiceForm.value?.id == form.id) _logServiceForm.value = null
+                // Counts, priority and odometer come exclusively from repository observations.
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                if (_logServiceForm.value?.id == form.id) _logServiceForm.value = form.copy(
+                    submissionError = when ((error as? MaintenanceException)?.failure) {
+                        MaintenanceFailure.Network -> R.string.garage_save_network_error
+                        MaintenanceFailure.PermissionDenied -> R.string.garage_permission_error
+                        MaintenanceFailure.AuthenticationExpired -> R.string.garage_auth_error
+                        MaintenanceFailure.InvalidData -> R.string.service_save_invalid
+                        else -> R.string.service_save_error
+                    },
+                )
             }
         }
     }
@@ -81,6 +149,7 @@ class MaintenanceViewModel @Inject constructor(
                 bikeRepository.observeUserBikes().flatMapLatest { bikes ->
                     // Garage has no selected-bike state. Its newest active bike is the default.
                     val bike = bikes.firstOrNull { it.isActive }
+                    if (_logServiceForm.value?.bike?.id != bike?.id) _logServiceForm.value = null
                     if (bike == null) flowOf(MaintenanceUiState.NoBike)
                     else {
                         if (_uiState.value.bike?.id != bike.id) {
@@ -107,6 +176,7 @@ class MaintenanceViewModel @Inject constructor(
                     failure == MaintenanceFailure.PermissionDenied ||
                     bikeFailure == BikeFailure.AuthenticationExpired || bikeFailure == BikeFailure.PermissionDenied
                 val state = _uiState.value
+                if (clearData) _logServiceForm.value = null
                 _uiState.value = MaintenanceUiState.Error(
                     bike = if (clearData) null else state.bike,
                     previousContent = if (clearData) null else state.retainedContent(),

@@ -166,22 +166,30 @@ private fun PriorityCard(assessment: MaintenanceAssessment, bike: Bike, onLogSer
                 }
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(AppSpacing.md), verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
-                Detail(R.string.maintenance_due_date, formatDate(assessment.item.dueDate), Modifier.weight(1f))
-                Detail(R.string.maintenance_due_odometer, formatKm(assessment.item.dueOdometerKm), Modifier.weight(1f))
+                assessment.item.dueDate?.let {
+                    Detail(R.string.maintenance_due_date, formatDate(it), Modifier.weight(1f))
+                }
+                assessment.item.dueOdometerKm?.let {
+                    Detail(R.string.maintenance_due_odometer, formatKm(it), Modifier.weight(1f))
+                }
                 Detail(R.string.maintenance_current_odometer, formatKm(bike.currentOdometer), Modifier.weight(1f))
             }
             HorizontalDivider()
             FlowRow(horizontalArrangement = Arrangement.spacedBy(AppSpacing.md), verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
-                Text(localizedString(when {
-                    assessment.remainingDays < 0 -> R.string.maintenance_days_overdue
-                    assessment.remainingDays == 0L -> R.string.maintenance_due_today
-                    else -> R.string.maintenance_days_remaining
-                }, formatNumber(abs(assessment.remainingDays))), color = statusColor(assessment.status))
-                Text(localizedString(when {
-                    assessment.remainingKm < 0 -> R.string.maintenance_km_overdue
-                    assessment.remainingKm == 0L -> R.string.maintenance_due_now
-                    else -> R.string.maintenance_km_remaining
-                }, formatNumber(abs(assessment.remainingKm))), color = statusColor(assessment.status))
+                assessment.remainingDays?.let { remaining ->
+                    Text(localizedString(when {
+                        remaining < 0 -> R.string.maintenance_days_overdue
+                        remaining == 0L -> R.string.maintenance_due_today
+                        else -> R.string.maintenance_days_remaining
+                    }, formatNumber(abs(remaining))), color = statusColor(assessment.status))
+                }
+                assessment.remainingKm?.let { remaining ->
+                    Text(localizedString(when {
+                        remaining < 0 -> R.string.maintenance_km_overdue
+                        remaining == 0L -> R.string.maintenance_due_now
+                        else -> R.string.maintenance_km_remaining
+                    }, formatNumber(abs(remaining))), color = statusColor(assessment.status))
+                }
             }
             Text(localizedString(R.string.maintenance_progress), style = MaterialTheme.typography.labelLarge)
             LinearProgressIndicator(progress = { assessment.dueWindowProgress }, modifier = Modifier.fillMaxWidth(),
@@ -204,8 +212,12 @@ private fun MaintenanceRow(assessment: MaintenanceAssessment, onClick: () -> Uni
                 Text(assessment.item.name, style = MaterialTheme.typography.titleMedium)
                 StatusBadge(assessment.status)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(AppSpacing.md), verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
-                    Detail(R.string.maintenance_due_date, formatDate(assessment.item.dueDate), Modifier.weight(1f))
-                    Detail(R.string.maintenance_due_odometer, formatKm(assessment.item.dueOdometerKm), Modifier.weight(1f))
+                    assessment.item.dueDate?.let {
+                        Detail(R.string.maintenance_due_date, formatDate(it), Modifier.weight(1f))
+                    }
+                    assessment.item.dueOdometerKm?.let {
+                        Detail(R.string.maintenance_due_odometer, formatKm(it), Modifier.weight(1f))
+                    }
                 }
             }
             Icon(painterResource(R.drawable.ic_chevron_right), null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
