@@ -19,7 +19,9 @@ import studio.appvero.bikecare.features.home.ui.screen.HomeScreen
 import studio.appvero.bikecare.features.home.ui.screen.HomeTab
 import studio.appvero.bikecare.features.home.ui.screen.HomeTabScreen
 import studio.appvero.bikecare.features.garage.ui.screen.GarageRoute as GarageContent
-import studio.appvero.bikecare.features.garage.ui.screen.AddBikeScreen
+import studio.appvero.bikecare.features.garage.ui.screen.AddBikeRoute as AddBikeContent
+import studio.appvero.bikecare.features.maintenance.ui.screen.MaintenanceRoute as MaintenanceContent
+import studio.appvero.bikecare.features.maintenance.ui.screen.AddMaintenanceRoute as AddMaintenanceContent
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -71,12 +73,13 @@ fun AppNavHost(navController: NavHostController) {
                 val entry by homeController.currentBackStackEntryAsState()
                 val destination = entry?.destination
                 val selected = when {
-                    destination?.hasRoute<MaintenanceRoute>() == true -> HomeTab.Care
+                    destination?.hasRoute<MaintenanceRoute>() == true || destination?.hasRoute<AddMaintenanceRoute>() == true -> HomeTab.Care
                     destination?.hasRoute<BikesRoute>() == true || destination?.hasRoute<AddBikeRoute>() == true -> HomeTab.Garage
                     destination?.hasRoute<ProfileRoute>() == true -> HomeTab.More
                     else -> HomeTab.Home
                 }
-                HomeScreen(selected, destination?.hasRoute<AddBikeRoute>() != true, onSelectTab = { tab ->
+                HomeScreen(selected, destination?.hasRoute<AddBikeRoute>() != true &&
+                    destination?.hasRoute<AddMaintenanceRoute>() != true, onSelectTab = { tab ->
                     val route: Any = when (tab) {
                         HomeTab.Home -> DashboardRoute
                         HomeTab.Care -> MaintenanceRoute
@@ -91,12 +94,19 @@ fun AppNavHost(navController: NavHostController) {
                 }) {
                     NavHost(homeController, startDestination = DashboardRoute) {
                         composable<DashboardRoute> { HomeTabScreen(HomeTab.Home, state, onEvent) }
-                        composable<MaintenanceRoute> { HomeTabScreen(HomeTab.Care, state, onEvent) }
+                        composable<MaintenanceRoute> {
+                            MaintenanceContent(onNavigateToAddLog = {
+                                homeController.navigate(AddMaintenanceRoute) { launchSingleTop = true }
+                            })
+                        }
                         composable<BikesRoute> {
                             GarageContent(onNavigateToAddBike = { homeController.navigate(AddBikeRoute) { launchSingleTop = true } })
                         }
                         composable<ProfileRoute> { HomeTabScreen(HomeTab.More, state, onEvent) }
-                        composable<AddBikeRoute> { AddBikeScreen(onBack = { homeController.popBackStack() }) }
+                        composable<AddBikeRoute> { AddBikeContent(onNavigateBack = { homeController.popBackStack() }) }
+                        composable<AddMaintenanceRoute> {
+                            AddMaintenanceContent(onNavigateBack = { homeController.popBackStack() })
+                        }
                     }
                 }
             }

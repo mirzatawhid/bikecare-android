@@ -133,11 +133,14 @@ class FirebaseBikeRepository @Inject constructor(
             currentOdometer = getLong("currentOdometer")
                 ?: throw BikeException(BikeFailure.InvalidData),
             imageUrl = getString("imageUrl"),
-            createdAt = getTimestamp("createdAt")?.toDate()?.time
+            // Pending server timestamps are unresolved in the local snapshot; use Firestore's
+            // estimate so queued offline writes can still be rendered in the Garage.
+            createdAt = getTimestamp("createdAt", DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)?.toDate()?.time
                 ?: throw BikeException(BikeFailure.InvalidData),
-            updatedAt = getTimestamp("updatedAt")?.toDate()?.time
+            updatedAt = getTimestamp("updatedAt", DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)?.toDate()?.time
                 ?: throw BikeException(BikeFailure.InvalidData),
             isActive = getBoolean("isActive") ?: throw BikeException(BikeFailure.InvalidData),
+            isSyncPending = metadata.hasPendingWrites(),
         )
         if (getString("id") != id) throw BikeException(BikeFailure.InvalidData)
         validate(bike)

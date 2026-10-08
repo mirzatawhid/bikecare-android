@@ -13,4 +13,6 @@ data class Bike(
     val createdAt: Long = 0,
     val updatedAt: Long = 0,
     val isActive: Boolean = true,
+    /** Transient Firestore snapshot metadata; this is not stored in the bike document. */
+    val isSyncPending: Boolean = false,
 )

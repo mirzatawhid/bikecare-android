@@ -24,4 +24,20 @@
     <string name="garage_inactive">নিষ্ক্রিয়</string>
     <string name="garage_add_placeholder">বাইক যোগ করার ফর্ম শীঘ্রই আসছে। এখানে আপনার মোটরসাইকেলের তথ্য দিতে পারবেন।</string>
     <string name="garage_back">গ্যারেজে ফিরুন</string>
+    <string name="garage_sync_pending">সিঙ্কের অপেক্ষায়</string>
+    <string name="add_bike_form_hint">গ্যারেজে যোগ করতে আপনার মোটরসাইকেলের তথ্য দিন।</string>
+    <string name="add_bike_brand">ব্র্যান্ড</string>
+    <string name="add_bike_model">মডেল</string>
+    <string name="add_bike_year">মডেল বছর</string>
+    <string name="add_bike_registration">রেজিস্ট্রেশন নম্বর (ঐচ্ছিক)</string>
+    <string name="add_bike_initial_odometer">প্রাথমিক ওডোমিটার (কিমি)</string>
+    <string name="add_bike_current_odometer">বর্তমান ওডোমিটার (কিমি)</string>
+    <string name="add_bike_save">বাইক সংরক্ষণ করুন</string>
+    <string name="add_bike_required">এই ঘরটি পূরণ করুন।</string>
+    <string name="add_bike_text_too_long">সর্বোচ্চ ১০০টি অক্ষর লিখুন।</string>
+    <string name="add_bike_year_invalid">১৮৮৫ থেকে ২১০০ সালের মধ্যে একটি বছর লিখুন।</string>
+    <string name="add_bike_registration_too_long">সর্বোচ্চ ৫০টি অক্ষর লিখুন।</string>
+    <string name="add_bike_odometer_invalid">০ থেকে ১০,০০০,০০০-এর মধ্যে পূর্ণসংখ্যা লিখুন।</string>
+    <string name="add_bike_current_odometer_invalid">বর্তমান ওডোমিটার প্রাথমিক ওডোমিটারের সমান বা বেশি হতে হবে।</string>
+    <string name="add_bike_save_error">বাইকটি যোগ করা যায়নি। আবার চেষ্টা করুন।</string>
 </resources>

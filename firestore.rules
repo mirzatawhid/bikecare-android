@@ -28,6 +28,38 @@ service cloud.firestore {
         && bike.isActive is bool;
     }
 
+    function validMaintenance(uid, logId) {
+      let log = request.resource.data;
+      return logId.size() > 0 && logId.size() <= 128
+        && log.keys().hasAll(['bikeId', 'title', 'category', 'serviceType', 'date',
+          'odometer', 'cost', 'provider', 'description', 'nextServiceOdometer',
+          'nextServiceDate', 'receiptUrl', 'createdAt'])
+        && log.keys().hasOnly(['bikeId', 'title', 'category', 'serviceType', 'date',
+          'odometer', 'cost', 'provider', 'description', 'nextServiceOdometer',
+          'nextServiceDate', 'receiptUrl', 'createdAt'])
+        && log.bikeId is string && log.bikeId.size() > 0 && log.bikeId.size() <= 128
+        && log.bikeId.matches('[^/]+') && log.bikeId != '.' && log.bikeId != '..'
+        && exists(/databases/$(database)/documents/users/$(uid)/bikes/$(log.bikeId))
+        && get(/databases/$(database)/documents/users/$(uid)/bikes/$(log.bikeId)).data.isActive == true
+        && log.title is string && log.title.size() > 0 && log.title.size() <= 100
+        && log.category in ['ENGINE', 'BRAKES', 'TIRES', 'ELECTRICAL', 'GENERAL']
+        && log.serviceType in ['PREVENTIVE', 'REPAIR', 'INSPECTION']
+        && log.date is timestamp && log.date >= timestamp.date(1970, 1, 1)
+        && log.date <= timestamp.date(2100, 1, 1)
+        && log.odometer is int && log.odometer >= 0 && log.odometer <= 10000000
+        && log.cost is int && log.cost >= 0 && log.cost <= 1000000000
+        && log.provider is string && log.provider.size() <= 100
+        && log.description is string && log.description.size() <= 1000
+        && (log.nextServiceOdometer == null ||
+          (log.nextServiceOdometer is int && log.nextServiceOdometer >= log.odometer
+            && log.nextServiceOdometer <= 10000000))
+        && (log.nextServiceDate == null ||
+          (log.nextServiceDate is timestamp && log.nextServiceDate >= log.date
+            && log.nextServiceDate <= timestamp.date(2100, 1, 1)))
+        && log.receiptUrl == null
+        && log.createdAt is timestamp && log.createdAt == request.time;
+    }
+
     match /users/{uid} {
       allow read: if isVerifiedOwner(uid);
       // Profile writes and future collections need their own schema before enabling.
@@ -41,6 +73,10 @@ service cloud.firestore {
           && request.resource.data.initialOdometer == resource.data.initialOdometer
           && request.resource.data.updatedAt == request.time;
         allow delete: if isVerifiedOwner(uid);
+      }
+      match /maintenanceLogs/{logId} {
+        allow read: if isVerifiedOwner(uid);
+        allow create: if isVerifiedOwner(uid) && validMaintenance(uid, logId);
       }
     }
     // Unmatched paths are denied. Do not add a permissive catch-all rule.

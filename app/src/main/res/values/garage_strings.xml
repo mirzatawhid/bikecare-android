@@ -24,4 +24,20 @@
     <string name="garage_inactive">Inactive</string>
     <string name="garage_add_placeholder">The add bike form is coming soon. You will be able to enter your motorcycle details here.</string>
     <string name="garage_back">Back to Garage</string>
+    <string name="garage_sync_pending">Waiting to sync</string>
+    <string name="add_bike_form_hint">Enter your motorcycle details to add it to your garage.</string>
+    <string name="add_bike_brand">Brand</string>
+    <string name="add_bike_model">Model</string>
+    <string name="add_bike_year">Model year</string>
+    <string name="add_bike_registration">Registration number (optional)</string>
+    <string name="add_bike_initial_odometer">Initial odometer (km)</string>
+    <string name="add_bike_current_odometer">Current odometer (km)</string>
+    <string name="add_bike_save">Save bike</string>
+    <string name="add_bike_required">This field is required.</string>
+    <string name="add_bike_text_too_long">Enter no more than 100 characters.</string>
+    <string name="add_bike_year_invalid">Enter a year between 1885 and 2100.</string>
+    <string name="add_bike_registration_too_long">Enter no more than 50 characters.</string>
+    <string name="add_bike_odometer_invalid">Enter a whole number from 0 to 10,000,000.</string>
+    <string name="add_bike_current_odometer_invalid">Current odometer must be at least the initial odometer.</string>
+    <string name="add_bike_save_error">We could not add this bike. Please try again.</string>
 </resources>

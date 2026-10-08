@@ -38,4 +38,7 @@ data object AddBikeRoute
 data object MaintenanceRoute
 
 @Serializable
+data object AddMaintenanceRoute
+
+@Serializable
 data object ProfileRoute
