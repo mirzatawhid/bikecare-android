@@ -42,3 +42,9 @@ data object AddMaintenanceRoute
 
 @Serializable
 data object ProfileRoute
+
+@Serializable
+data object FuelLogListRoute
+
+@Serializable
+data object AddFuelLogRoute

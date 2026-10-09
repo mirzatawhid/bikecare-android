@@ -60,6 +60,32 @@ service cloud.firestore {
         && log.createdAt is timestamp && log.createdAt == request.time;
     }
 
+    function validFuelLog(uid, logId) {
+      let log = request.resource.data;
+      return logId.size() > 0 && logId.size() <= 128
+        && log.keys().hasAll(['bikeId', 'date', 'odometer', 'fuelType', 'quantity',
+          'pricePerLiter', 'totalCost', 'station', 'fullTank', 'notes', 'createdAt'])
+        && log.keys().hasOnly(['bikeId', 'date', 'odometer', 'fuelType', 'quantity',
+          'pricePerLiter', 'totalCost', 'station', 'fullTank', 'notes', 'createdAt'])
+        && log.bikeId is string && log.bikeId.size() > 0 && log.bikeId.size() <= 128
+        && log.bikeId.matches('[^/]+') && log.bikeId != '.' && log.bikeId != '..'
+        && exists(/databases/$(database)/documents/users/$(uid)/bikes/$(log.bikeId))
+        && get(/databases/$(database)/documents/users/$(uid)/bikes/$(log.bikeId)).data.isActive == true
+        && log.date is timestamp && log.date >= timestamp.date(1970, 1, 1)
+        && log.date <= timestamp.date(2100, 1, 1)
+        && log.odometer is int && log.odometer >= 0 && log.odometer <= 10000000
+        && log.fuelType is string && log.fuelType.size() > 0 && log.fuelType.size() <= 50
+        && log.quantity is number && log.quantity > 0 && log.quantity <= 1000
+        && log.pricePerLiter is number && log.pricePerLiter > 0 && log.pricePerLiter <= 100000
+        && log.totalCost is number && log.totalCost > 0 && log.totalCost <= 100000000
+        && log.totalCost >= log.quantity * log.pricePerLiter - 0.011
+        && log.totalCost <= log.quantity * log.pricePerLiter + 0.011
+        && log.station is string && log.station.size() <= 100
+        && log.fullTank is bool
+        && log.notes is string && log.notes.size() <= 1000
+        && log.createdAt is timestamp && log.createdAt == request.time;
+    }
+
     match /users/{uid} {
       allow read: if isVerifiedOwner(uid);
       // Profile writes and future collections need their own schema before enabling.
@@ -77,6 +103,10 @@ service cloud.firestore {
       match /maintenanceLogs/{logId} {
         allow read: if isVerifiedOwner(uid);
         allow create: if isVerifiedOwner(uid) && validMaintenance(uid, logId);
+      }
+      match /fuelLogs/{logId} {
+        allow read: if isVerifiedOwner(uid);
+        allow create: if isVerifiedOwner(uid) && validFuelLog(uid, logId);
       }
     }
     // Unmatched paths are denied. Do not add a permissive catch-all rule.

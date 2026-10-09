@@ -37,7 +37,8 @@ fun HomeScreen(selectedTab: HomeTab, showBottomBar: Boolean, onSelectTab: (HomeT
 }
 
 @Composable
-fun HomeTabScreen(tab: HomeTab, state: HomeUiState, onEvent: (HomeEvent) -> Unit) {
+fun HomeTabScreen(tab: HomeTab, state: HomeUiState, onEvent: (HomeEvent) -> Unit,
+    onNavigateToFuelLogs: () -> Unit = {}) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(AppDimensions.screenHorizontalPadding),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.lg)) {
         Text(localizedString(tab.label), style = MaterialTheme.typography.headlineLarge)
@@ -47,6 +48,12 @@ fun HomeTabScreen(tab: HomeTab, state: HomeUiState, onEvent: (HomeEvent) -> Unit
             else -> R.string.more_intro
         }), color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (tab == HomeTab.More) {
+            Button(onClick = onNavigateToFuelLogs,
+                modifier = Modifier.heightIn(min = AppDimensions.minimumTouchTarget),
+                colors = ButtonDefaults.buttonColors(containerColor = AppTheme.colors.action,
+                    contentColor = AppTheme.colors.onAction)) {
+                Text(localizedString(R.string.fuel_profile_button))
+            }
             state.form.error?.let { Text(localizedString(it), color = MaterialTheme.colorScheme.error) }
             Button(onClick = { onEvent(HomeEvent.Logout) }, enabled = !state.form.busy,
                 modifier = Modifier.heightIn(min = AppDimensions.minimumTouchTarget),
