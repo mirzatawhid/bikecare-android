@@ -86,6 +86,29 @@ service cloud.firestore {
         && log.createdAt is timestamp && log.createdAt == request.time;
     }
 
+    function validExpense(uid, expenseId) {
+      let expense = request.resource.data;
+      return expenseId.size() > 0 && expenseId.size() <= 128
+        && expense.keys().hasAll(['bikeId', 'category', 'title', 'amount', 'date',
+          'notes', 'createdAt'])
+        && expense.keys().hasOnly(['bikeId', 'category', 'title', 'amount', 'date',
+          'notes', 'createdAt'])
+        && expense.bikeId is string && expense.bikeId.size() > 0
+        && expense.bikeId.size() <= 128 && expense.bikeId.matches('[^/]+')
+        && expense.bikeId != '.' && expense.bikeId != '..'
+        && exists(/databases/$(database)/documents/users/$(uid)/bikes/$(expense.bikeId))
+        && get(/databases/$(database)/documents/users/$(uid)/bikes/$(expense.bikeId)).data.isActive == true
+        && expense.category in ['ACCESSORY', 'PARKING', 'TOLL', 'INSURANCE',
+          'REGISTRATION', 'OTHER']
+        && expense.title is string && expense.title.size() > 0
+        && expense.title.size() <= 100
+        && expense.amount is int && expense.amount >= 1 && expense.amount <= 1000000000
+        && expense.date is timestamp && expense.date >= timestamp.date(1970, 1, 1)
+        && expense.date <= timestamp.date(2100, 1, 1)
+        && expense.notes is string && expense.notes.size() <= 1000
+        && expense.createdAt is timestamp && expense.createdAt == request.time;
+    }
+
     match /users/{uid} {
       allow read: if isVerifiedOwner(uid);
       // Profile writes and future collections need their own schema before enabling.
@@ -107,6 +130,10 @@ service cloud.firestore {
       match /fuelLogs/{logId} {
         allow read: if isVerifiedOwner(uid);
         allow create: if isVerifiedOwner(uid) && validFuelLog(uid, logId);
+      }
+      match /expenses/{expenseId} {
+        allow read: if isVerifiedOwner(uid);
+        allow create: if isVerifiedOwner(uid) && validExpense(uid, expenseId);
       }
     }
     // Unmatched paths are denied. Do not add a permissive catch-all rule.

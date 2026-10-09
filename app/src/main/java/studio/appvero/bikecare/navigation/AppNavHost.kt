@@ -24,6 +24,8 @@ import studio.appvero.bikecare.features.maintenance.ui.screen.MaintenanceRoute a
 import studio.appvero.bikecare.features.maintenance.ui.screen.AddMaintenanceRoute as AddMaintenanceContent
 import studio.appvero.bikecare.features.fuel.ui.screen.FuelLogListRoute as FuelLogListContent
 import studio.appvero.bikecare.features.fuel.ui.screen.AddFuelLogRoute as AddFuelLogContent
+import studio.appvero.bikecare.features.expense.ui.screen.ExpenseListRoute as ExpenseListContent
+import studio.appvero.bikecare.features.expense.ui.screen.AddExpenseRoute as AddExpenseContent
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -79,13 +81,17 @@ fun AppNavHost(navController: NavHostController) {
                     destination?.hasRoute<BikesRoute>() == true || destination?.hasRoute<AddBikeRoute>() == true -> HomeTab.Garage
                     destination?.hasRoute<ProfileRoute>() == true ||
                         destination?.hasRoute<FuelLogListRoute>() == true ||
-                        destination?.hasRoute<AddFuelLogRoute>() == true -> HomeTab.More
+                        destination?.hasRoute<AddFuelLogRoute>() == true ||
+                        destination?.hasRoute<ExpenseListRoute>() == true ||
+                        destination?.hasRoute<AddExpenseRoute>() == true -> HomeTab.More
                     else -> HomeTab.Home
                 }
                 HomeScreen(selected, destination?.hasRoute<AddBikeRoute>() != true &&
                     destination?.hasRoute<AddMaintenanceRoute>() != true &&
                     destination?.hasRoute<FuelLogListRoute>() != true &&
-                    destination?.hasRoute<AddFuelLogRoute>() != true, onSelectTab = { tab ->
+                    destination?.hasRoute<AddFuelLogRoute>() != true &&
+                    destination?.hasRoute<ExpenseListRoute>() != true &&
+                    destination?.hasRoute<AddExpenseRoute>() != true, onSelectTab = { tab ->
                     val route: Any = when (tab) {
                         HomeTab.Home -> DashboardRoute
                         HomeTab.Care -> MaintenanceRoute
@@ -110,7 +116,8 @@ fun AppNavHost(navController: NavHostController) {
                         }
                         composable<ProfileRoute> {
                             HomeTabScreen(HomeTab.More, state, onEvent,
-                                onNavigateToFuelLogs = { homeController.navigate(FuelLogListRoute) { launchSingleTop = true } })
+                                onNavigateToFuelLogs = { homeController.navigate(FuelLogListRoute) { launchSingleTop = true } },
+                                onNavigateToExpenses = { homeController.navigate(ExpenseListRoute) { launchSingleTop = true } })
                         }
                         composable<FuelLogListRoute> {
                             FuelLogListContent(
@@ -120,6 +127,15 @@ fun AppNavHost(navController: NavHostController) {
                         }
                         composable<AddFuelLogRoute> {
                             AddFuelLogContent(onNavigateBack = { homeController.popBackStack() })
+                        }
+                        composable<ExpenseListRoute> {
+                            ExpenseListContent(
+                                onNavigateToAddExpense = { homeController.navigate(AddExpenseRoute) { launchSingleTop = true } },
+                                onNavigateBack = { homeController.popBackStack() },
+                            )
+                        }
+                        composable<AddExpenseRoute> {
+                            AddExpenseContent(onNavigateBack = { homeController.popBackStack() })
                         }
                         composable<AddBikeRoute> { AddBikeContent(onNavigateBack = { homeController.popBackStack() }) }
                         composable<AddMaintenanceRoute> {

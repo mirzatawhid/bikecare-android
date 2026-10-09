@@ -10,6 +10,8 @@ import studio.appvero.bikecare.features.maintenance.data.repository.FirebaseMain
 import studio.appvero.bikecare.features.maintenance.data.repository.MaintenanceRepository
 import studio.appvero.bikecare.features.fuel.data.repository.FuelLogRepository
 import studio.appvero.bikecare.features.fuel.data.repository.FirebaseFuelLogRepository
+import studio.appvero.bikecare.features.expense.data.repository.ExpenseRepository
+import studio.appvero.bikecare.features.expense.data.repository.FirebaseExpenseRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -37,6 +39,10 @@ abstract class FirebaseModule {
     @Binds
     @Singleton
     abstract fun bindFuelLogRepository(repository: FirebaseFuelLogRepository): FuelLogRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindExpenseRepository(repository: FirebaseExpenseRepository): ExpenseRepository
 
     companion object {
         @Provides

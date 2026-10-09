@@ -35,8 +35,8 @@ Keep Firebase SDK types inside data/repository and DI code. ViewModels and UI us
 ### Navigation and Garage
 
 - Verified sessions enter a `Scaffold` with Home, Care, Garage, and More tabs.
-- `AppNavHost` owns the typed nested graph for Garage, Care, More, Add Bike, Add Maintenance, Fuel Logs, and Add Fuel Log. Tab state is saved/restored. Add forms hide the bottom bar and return to their tabs on Back; the session guard remains active.
-- Home remains a placeholder. Care shows the 100 most recent maintenance logs and opens an add form. More provides logout and a link to the 100 most recent fuel logs and their add form.
+- `AppNavHost` owns the typed nested graph for Garage, Care, More, Add Bike, Add Maintenance, Fuel Logs, Add Fuel Log, Expenses, and Add Expense. Tab state is saved/restored. Add forms hide the bottom bar and return to their tabs on Back; the session guard remains active.
+- Home remains a placeholder. Care shows the 100 most recent maintenance logs and opens an add form. More provides logout and links to the 100 most recent fuel logs and expenses and their add forms.
 - Garage lives under `features/garage` with domain/model, data/repository, and UI screen/ViewModel code. `GarageViewModel` exposes immutable `StateFlow` state and retained `SharedFlow` navigation effects. The route collects state lifecycle-aware; the screen is stateless.
 - Garage supports loading, empty, bike-list, retryable-error, and Add Bike states in English/Bangla using existing theme tokens.
 - Implemented bike operations: add, observe, update, delete. Details/edit/delete screens, Add Bike form and validation, image upload/display, and user-facing pending/rejected-write handling remain future work.
@@ -63,7 +63,7 @@ users/{uid}                                      # profile and account preferenc
   bikes/{bikeId}                                 # implemented
   fuelLogs/{fuelLogId}                           # implemented
   maintenanceLogs/{maintenanceLogId}             # implemented
-  expenses/{expenseId}                           # planned
+  expenses/{expenseId}                           # implemented
   reminders/{reminderId}                         # planned
   analytics/{bikeId}                             # planned per-bike derived summary
     months/{yyyy-MM}                              # planned monthly derived aggregate
@@ -97,12 +97,12 @@ Path: `users/{uid}/bikes/{bikeId}`. The document ID equals its `id` field and is
 
 ### Planned feature records
 
-These are target schemas except for Maintenance and Fuel, which are implemented as described below. Before implementing another feature, define its Kotlin model, validation, write semantics, indexes, and matching rules together. Prefer explicit fields and bounded documents; do not store an unbounded history in a single document.
+These are target schemas except for Maintenance, Fuel, and Expenses, which are implemented as described below. Before implementing another feature, define its Kotlin model, validation, write semantics, indexes, and matching rules together. Prefer explicit fields and bounded documents; do not store an unbounded history in a single document.
 
 - **Profile — `users/{uid}`:** optional display name, photo reference, preferred currency, locale, and `createdAt`/`updatedAt`. Firebase Auth remains authoritative for email and verification. Store only fields the product needs; profile writes are currently denied by rules.
 - **Fuel — `fuelLogs/{fuelLogId}` (implemented):** The document ID is the log ID. Fields are `bikeId`, `date` (Timestamp), `odometer`, `fuelType`, `quantity` (liters), `pricePerLiter` and `totalCost` (BDT numeric amounts), `station`, `fullTank`, `notes`, and server `createdAt`. The add form calculates total cost to two decimal places with decimal arithmetic before writing numeric Firestore fields. Reads show the 100 most recent logs ordered by `date`; writes are create-only and may remain pending offline. Define fuel-efficiency calculation rules before using partial fills; do not infer a full-tank interval from incomplete data.
 - **Maintenance — `maintenanceLogs/{maintenanceLogId}` (implemented):** The document ID is the log ID. Fields are `bikeId`, `title`, `category`, `serviceType`, `date` (Timestamp), `odometer`, `cost` (whole BDT), `provider`, `description`, nullable `nextServiceOdometer`, `nextServiceDate` (Timestamp), `receiptUrl` (currently null), and server `createdAt`. Reads show the 100 most recent logs ordered by `date`; writes are create-only and may remain pending offline. Receipt uploads, edit/delete, and pagination are not implemented.
-- **Expenses — `expenses/{expenseId}`:** `id`, `bikeId`, `categoryId`, `occurredAt`, `amountMinor`, `currencyCode`, `note` (optional), optional `maintenanceLogId`/`fuelLogId` when linked, `createdAt`, `updatedAt`. Avoid double-counting linked records in totals by defining one source of truth per expense category.
+- **Expenses — `expenses/{expenseId}` (implemented):** The document ID is the expense ID. Fields are `bikeId`, `category` (`ACCESSORY`, `PARKING`, `TOLL`, `INSURANCE`, `REGISTRATION`, or `OTHER`), `title`, `amount` (whole BDT), `date` (Timestamp), `notes`, and server `createdAt`. Reads show the 100 most recent expenses ordered by `date`; writes are create-only and may remain pending offline. Fuel and maintenance costs are recorded in their own collections, so expense categories exclude them to avoid double-counting.
 - **Reminders — `reminders/{reminderId}`:** `id`, `bikeId`, `title`, `kind`, optional `dueAt` and/or `dueOdometerKm`, `status`, `completedAt` (optional), optional source maintenance record ID, `createdAt`, `updatedAt`. Local notifications can be scheduled on-device; delivery must not depend on an unimplemented server job.
 - **Per-bike analytics — `analytics/{bikeId}`:** rebuildable summary keyed by bike ID, with calculation/version metadata, update time, and only bounded headline values needed by dashboard screens (for example, total cost and latest known odometer). Treat it as derived data, not the source of truth.
 - **Monthly aggregates — `analytics/{bikeId}/months/{yyyy-MM}`:** one document per bike and calendar month, with month key/timezone policy, currency-separated totals by category, event counts, and calculation version/update time. Do not combine currencies into one total. Define whether month boundaries use the user's configured timezone before implementation.
@@ -112,7 +112,7 @@ For planned date-based records, `occurredAt` represents the event time and `crea
 ### Ownership, rules, and validation
 
 - All client reads/writes must use the signed-in UID's path. Firestore Rules require `request.auth != null`, `request.auth.uid == uid`, and `request.auth.token.email_verified == true` for user data. The app refreshes the ID token after verification before entering Home; a stale token can be denied until refreshed.
-- Root `firestore.rules` uses rules version 2. Current rules allow verified owners to read their user document, validate bike CRUD, and read/create maintenance and fuel logs for an existing active bike under the same UID. Profile writes, expenses, reminders, analytics, and unmatched paths remain denied. Rules must be extended narrowly as each feature ships; never add a recursive catch-all write grant.
+- Root `firestore.rules` uses rules version 2. Current rules allow verified owners to read their user document, validate bike CRUD, and read/create maintenance, fuel, and expense records for an existing active bike under the same UID. Profile writes, reminders, analytics, and unmatched paths remain denied. Rules must be extended narrowly as each feature ships; never add a recursive catch-all write grant.
 - Validate allowed keys, types, required values, bounds, path/document ID consistency, immutable fields, and server timestamps. Rules are the server-side authority. Client validation improves feedback but cannot authoritatively detect duplicates, missing remote records, or concurrent changes while offline.
 - A bike's parent ownership does not automatically validate a related log's `bikeId`. When rules are extended, verify the referenced bike exists under the same UID and define behavior for inactive/deleted bikes. Keep rule document lookups bounded and account for their access-call limits.
 - Unverified/anonymous users, other UIDs, malformed documents, forbidden fields, and unimplemented paths must be denied. Never display raw Firebase exception text or log credentials, tokens, or email addresses.
@@ -121,7 +121,7 @@ For planned date-based records, `occurredAt` represents the event time and `crea
 ### IDs, timestamps, and writes
 
 - Current bike IDs remain caller-supplied stable values. For future append-only log records, prefer Firestore auto IDs or UUIDs rather than sequential IDs. Store IDs in the document only when application/domain code needs them; if stored, require equality with the document ID.
-- Use Firestore `Timestamp` for instants. Represent calendar month aggregates with a documented `yyyy-MM` key plus an explicit timezone/month-boundary policy. For future money schemas, prefer integer minor units plus ISO 4217 currency code; existing maintenance and requested fuel schemas use BDT amounts directly.
+- Use Firestore `Timestamp` for instants. Represent calendar month aggregates with a documented `yyyy-MM` key plus an explicit timezone/month-boundary policy. For future money schemas, prefer integer minor units plus ISO 4217 currency code; existing maintenance, fuel, and expense schemas use BDT amounts directly.
 - Create with server `createdAt` and `updatedAt`; update `updatedAt` with server time and preserve immutable creation fields. For client-generated event times, distinguish event time from server persistence time.
 - Firestore transactions/batches are for bounded atomic operations, not large histories. Avoid client-side read-modify-write aggregates that can lose concurrent updates. MVP screens can calculate small summaries from queried source records; add server-maintained aggregates only when access volume or cost justifies them.
 
@@ -134,8 +134,9 @@ Design queries around the screens, use bounded pages for histories, and add inde
 | Garage bikes | `users/{uid}/bikes`, order by `createdAt` descending | Current default single-field index is sufficient; do not exempt `createdAt`. |
 | Care maintenance list | `users/{uid}/maintenanceLogs`, order by `date` descending, limit 100 | Default single-field index on `date` is sufficient. |
 | Fuel log list | `users/{uid}/fuelLogs`, order by `date` descending, limit 100 | Default single-field index on `date` is sufficient. |
-| Recent fuel/maintenance/expenses for one bike | Filter `bikeId == selectedBikeId`, order by `occurredAt` descending, limit/page | Composite index for `bikeId` plus `occurredAt` descending; create from deployed query requirements. |
-| User-wide history | Order a record collection by `occurredAt` descending, optionally filter category/status | Single-field index for ordering; add composite index for each combined filter/order shape. |
+| Expense list | `users/{uid}/expenses`, order by `date` descending, limit 100 | Default single-field index on `date` is sufficient. |
+| Recent fuel/maintenance/expenses for one bike (future) | Filter `bikeId == selectedBikeId`, order by `date` descending, limit/page | Composite index for `bikeId` plus `date` descending; create from deployed query requirements. |
+| User-wide history | Order a record collection by its event date descending, optionally filter category/status | Single-field index for ordering; add composite index for each combined filter/order shape. |
 | Upcoming reminders | Filter active status and due date (and/or bike), order by due date | Composite index matching equality filters and due-time ordering. Use separate queries if combining due date and odometer creates awkward semantics. |
 | Dashboard/month view | Read `analytics/{bikeId}` and the requested `months/{yyyy-MM}` document | Direct document reads; no collection query index required. |
 
@@ -173,7 +174,8 @@ Store private media under the established UID-scoped pattern `{uid}/{fileId}`. K
 | Profile document writes | Denied/not implemented |
 | Maintenance | Care list and add form, Firestore repository and local rules implemented; rules still require deployment |
 | Fuel | More tab list and add form, Firestore repository and local rules implemented; rules still require deployment |
-| Expenses, reminders | Planned; no collections/writes implemented |
+| Expenses | More tab list and add form, Firestore repository and local rules implemented; rules still require deployment |
+| Reminders | Planned; no collections/writes implemented |
 | Per-bike and monthly business aggregates | Planned; distinct from Firebase Analytics telemetry |
 | Cloud Functions | Deferred; not required for MVP |
 | Storage uploads and image loading | Deferred; SDK included |
